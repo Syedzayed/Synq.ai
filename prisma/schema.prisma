@@ -1,0 +1,47 @@
+// Synq — Prisma Schema
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// User — core auth entity (email/password credentials)
+// ---------------------------------------------------------------------------
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile Profile?
+
+  @@map("users")
+}
+
+// ---------------------------------------------------------------------------
+// Profile — extended networking profile for AI matching
+// ---------------------------------------------------------------------------
+model Profile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  bio       String?
+  location  String?
+  industry  String?
+  goals     String[] // e.g. ["fundraising", "hiring", "mentorship"]
+  skills    String[] // e.g. ["TypeScript", "ML", "Product"]
+  embedding Float[]  // Mistral-generated vector for similarity search
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
