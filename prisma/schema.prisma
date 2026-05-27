@@ -1,14 +1,13 @@
-// Synq — Prisma Schema
-// Learn more: https://pris.ly/d/prisma-schema
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // ⚠️ Prisma 7: URL is configured in prisma.config.ts — NOT here.
 }
 
 // ---------------------------------------------------------------------------
