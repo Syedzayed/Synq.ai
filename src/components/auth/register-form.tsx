@@ -4,9 +4,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { Eye, EyeOff, ArrowRight, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, ArrowRight, Loader2, CheckCircle, AlertCircle, Mail } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 import { registerFormSchema, type RegisterFormInput } from "@/lib/validations";
 import { supabase } from "@/lib/auth/supabase";
@@ -15,7 +14,7 @@ import { AuthCard } from "./auth-card";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-type FormState = "idle" | "loading" | "success" | "error";
+type FormState = "idle" | "loading" | "success" | "confirm-email" | "error";
 
 interface FieldProps {
   label: string;
@@ -111,7 +110,6 @@ function FormField({
 }
 
 export function RegisterForm() {
-  const router = useRouter();
   const [formState, setFormState] = useState<FormState>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -163,13 +161,26 @@ export function RegisterForm() {
       }
     }
 
-    setFormState("success");
-    // Brief success flash before redirect
-    setTimeout(() => router.push("/onboarding"), 1200);
+    if (authData.session) {
+      // Email confirmation is OFF — session is immediately available.
+      // Hard-navigate so the browser sends the new session cookie to Next.js
+      // and proxy.ts can hydrate the Supabase session on the next request.
+      setFormState("success");
+      setTimeout(() => {
+        window.location.href = "/onboarding";
+      }, 1200);
+    } else {
+      // Email confirmation is ON — no session yet.
+      // Show a "check your inbox" state instead of redirecting to a
+      // protected page the user cannot access until they confirm.
+      setFormState("confirm-email");
+    }
   };
 
   const isLoading = formState === "loading";
   const isSuccess = formState === "success";
+  const isConfirmEmail = formState === "confirm-email";
+  const isDone = isSuccess || isConfirmEmail;
 
   return (
     <AuthCard>
@@ -222,7 +233,7 @@ export function RegisterForm() {
         )}
       </AnimatePresence>
 
-      {/* Success banner */}
+      {/* Success banner (email confirmation OFF) */}
       <AnimatePresence>
         {isSuccess && (
           <motion.div
@@ -236,9 +247,38 @@ export function RegisterForm() {
           >
             <CheckCircle size={15} className="text-green-500 shrink-0 mt-0.5" />
             <p className="text-[13px] text-green-700">
-              Account created! Check your inbox to confirm your email, then we&apos;ll
-              get you set up.
+              Account created! Redirecting you now…
             </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Confirm-email banner (email confirmation ON) */}
+      <AnimatePresence>
+        {isConfirmEmail && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-5 flex items-start gap-3 rounded-2xl p-4"
+            style={{
+              background: "rgba(224,122,95,0.07)",
+              border: "1px solid rgba(224,122,95,0.25)",
+            }}
+          >
+            <Mail size={15} style={{ color: "#e07a5f", flexShrink: 0, marginTop: 2 }} />
+            <div>
+              <p className="text-[13px] font-semibold mb-0.5" style={{ color: "#3a3530" }}>
+                Check your inbox
+              </p>
+              <p className="text-[12.5px]" style={{ color: "#9e9890" }}>
+                We sent a confirmation link to your email. Click it to activate
+                your account, then{" "}
+                <Link href="/login" className="underline" style={{ color: "#e07a5f" }}>
+                  sign in here
+                </Link>
+                .
+              </p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -312,17 +352,17 @@ export function RegisterForm() {
         <motion.button
           id="register-submit"
           type="submit"
-          disabled={isLoading || isSuccess}
-          whileHover={{ scale: isLoading || isSuccess ? 1 : 1.015 }}
-          whileTap={{ scale: isLoading || isSuccess ? 1 : 0.985 }}
+          disabled={isLoading || isDone}
+          whileHover={{ scale: isLoading || isDone ? 1 : 1.015 }}
+          whileTap={{ scale: isLoading || isDone ? 1 : 0.985 }}
           className="mt-2 w-full flex items-center justify-center gap-2.5 rounded-2xl py-3.5 text-[14.5px] font-semibold text-white transition-all duration-200"
           style={{
             background:
-              isLoading || isSuccess
+              isLoading || isDone
                 ? "rgba(224,122,95,0.6)"
                 : "linear-gradient(135deg, #e07a5f 0%, #d4694f 100%)",
             boxShadow:
-              isLoading || isSuccess
+              isLoading || isDone
                 ? "none"
                 : "0 2px 12px rgba(224,122,95,0.35)",
           }}
@@ -336,6 +376,11 @@ export function RegisterForm() {
             <>
               <CheckCircle size={16} />
               Account created!
+            </>
+          ) : isConfirmEmail ? (
+            <>
+              <Mail size={16} />
+              Check your email
             </>
           ) : (
             <>

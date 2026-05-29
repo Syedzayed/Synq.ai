@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { AuthLayout } from "@/components/auth/auth-layout";
 import { LoginForm } from "@/components/auth/login-form";
 
@@ -11,7 +12,10 @@ export const metadata: Metadata = {
 export default function LoginPage() {
   return (
     <AuthLayout>
-      <LoginForm />
+      {/* Suspense required because LoginForm reads useSearchParams() */}
+      <Suspense fallback={null}>
+        <LoginForm />
+      </Suspense>
     </AuthLayout>
   );
 }

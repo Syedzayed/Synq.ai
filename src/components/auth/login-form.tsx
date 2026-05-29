@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, ArrowRight, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { loginSchema, type LoginInput } from "@/lib/validations";
 import { supabase } from "@/lib/auth/supabase";
@@ -104,6 +104,7 @@ function FormField({
 
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [formState, setFormState] = useState<FormState>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -144,8 +145,17 @@ export function LoginForm() {
     }
 
     setFormState("success");
-    // Brief success flash before redirect
-    setTimeout(() => router.push("/onboarding"), 800);
+
+    // Hard navigation so the browser sends the new Supabase session cookie
+    // to Next.js on the next request — this lets proxy.ts refresh the session.
+    // Also honour the ?next redirect param set by the proxy on protected routes.
+    const next = searchParams.get("next");
+    const destination =
+      next && next.startsWith("/") ? next : "/onboarding";
+
+    setTimeout(() => {
+      window.location.href = destination;
+    }, 800);
   };
 
   const isLoading = formState === "loading";

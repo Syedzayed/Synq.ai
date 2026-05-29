@@ -29,14 +29,30 @@ model User {
 // Profile — extended networking profile for AI matching
 // ---------------------------------------------------------------------------
 model Profile {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  bio       String?
-  location  String?
-  industry  String?
-  goals     String[] // e.g. ["fundraising", "hiring", "mentorship"]
-  skills    String[] // e.g. ["TypeScript", "ML", "Product"]
-  embedding Float[]  // Mistral-generated vector for similarity search
+  id           String    @id @default(cuid())
+  userId       String    @unique
+
+  // ── Onboarding fields ────────────────────────────────────────────────────
+  name         String?   // display name captured during onboarding
+  role         String?   // e.g. "Software Engineer", "Designer", "Founder"
+  organization String?   // company or university
+
+  skills       String[]  // e.g. ["TypeScript", "ML", "Product Strategy"]
+  interests    String[]  // e.g. ["AI", "Startups", "Climate Tech"]
+  projects     String?   // free-text: what they're currently building
+  goals        String[]  // e.g. ["Find cofounders", "Meet researchers"]
+  lookingFor   String[]  // e.g. ["Developers", "Designers", "Founders"]
+
+  aiSummary    String?   // Mistral-generated 2–3 sentence profile summary
+  embedding    Float[]   // Mistral embedding vector for semantic matching
+
+  completedAt  DateTime? // set when onboarding finishes; null = incomplete
+
+  // ── Legacy / extended fields ─────────────────────────────────────────────
+  bio          String?
+  location     String?
+  industry     String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
