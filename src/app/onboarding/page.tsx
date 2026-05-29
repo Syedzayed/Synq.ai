@@ -1,38 +1,51 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { getServerUser } from "@/lib/auth/supabase-server";
+import { WelcomeBanner } from "@/components/onboarding/welcome-banner";
 
 export const metadata: Metadata = {
-  title: "Onboarding — Synq",
-  description: "Set up your Synq profile.",
+  title: "Welcome to Synq — Let's get you set up",
+  description:
+    "Your Synq account is ready. Complete your profile so our AI can start finding the right people for you.",
 };
 
 /**
- * Placeholder — onboarding flow will be built separately.
- * Successful auth redirects here.
+ * Onboarding entry point — shown immediately after login or registration.
+ * Protected: proxy.ts redirects unauthenticated visitors to /login.
  */
-export default function OnboardingPage() {
+export default async function OnboardingPage() {
+  const user = await getServerUser();
+
+  // Extra server-side guard (belt-and-suspenders alongside proxy.ts)
+  if (!user) {
+    redirect("/login");
+  }
+
+  const name: string | null =
+    user.user_metadata?.full_name ?? user.user_metadata?.name ?? null;
+
+  // Determine if this is a brand-new account (created within the last 5 min)
+  const createdAt = user.created_at ? new Date(user.created_at) : null;
+  const isNewUser = createdAt
+    ? Date.now() - createdAt.getTime() < 5 * 60 * 1000
+    : false;
+
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center gap-4"
+      className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden"
       style={{ background: "#fdfbf7" }}
     >
+      {/* Ambient glow */}
       <div
-        className="h-12 w-12 rounded-2xl flex items-center justify-center text-white text-xl font-bold"
-        style={{ background: "linear-gradient(135deg, #e07a5f, #f4a261)" }}
-      >
-        S
-      </div>
-      <h1
-        className="text-2xl font-medium"
+        aria-hidden="true"
+        className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full blur-3xl opacity-20"
         style={{
-          fontFamily: "Instrument Serif, ui-serif, Georgia, serif",
-          color: "#1e1a17",
+          background:
+            "radial-gradient(ellipse, rgba(224,122,95,0.5) 0%, rgba(244,162,97,0.3) 50%, transparent 100%)",
         }}
-      >
-        Onboarding coming soon.
-      </h1>
-      <p className="text-[14px]" style={{ color: "#9e9890" }}>
-        Authentication successful — this page will be built next.
-      </p>
+      />
+
+      <WelcomeBanner name={name} isNewUser={isNewUser} />
     </div>
   );
 }

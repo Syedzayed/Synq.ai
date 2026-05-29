@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 
 import { loginSchema, type LoginInput } from "@/lib/validations";
 import { supabase } from "@/lib/auth/supabase";
+import { checkLoginRateLimit } from "@/actions/auth";
 import { AuthCard } from "./auth-card";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -118,6 +119,14 @@ export function LoginForm() {
   const onSubmit = async (data: LoginInput) => {
     setFormState("loading");
     setErrorMessage("");
+
+    // Server-side rate limit check
+    const rl = await checkLoginRateLimit();
+    if (!rl.allowed) {
+      setFormState("error");
+      setErrorMessage(rl.error ?? "Too many attempts. Please wait.");
+      return;
+    }
 
     const { error } = await supabase.auth.signInWithPassword({
       email: data.email,

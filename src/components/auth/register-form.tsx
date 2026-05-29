@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 
 import { registerFormSchema, type RegisterFormInput } from "@/lib/validations";
 import { supabase } from "@/lib/auth/supabase";
+import { postRegistration } from "@/actions/auth";
 import { AuthCard } from "./auth-card";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -128,7 +129,7 @@ export function RegisterForm() {
     setFormState("loading");
     setErrorMessage("");
 
-    const { error } = await supabase.auth.signUp({
+    const { data: authData, error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
       options: {
@@ -148,9 +149,23 @@ export function RegisterForm() {
       return;
     }
 
+    // Run post-registration: DB profile creation + welcome email
+    if (authData.user) {
+      const result = await postRegistration({
+        supabaseId: authData.user.id,
+        email: data.email,
+        name: data.name,
+      });
+
+      if (!result.success && result.error) {
+        // Non-fatal — account was created, but something else went wrong
+        console.warn("[RegisterForm] postRegistration warning:", result.error);
+      }
+    }
+
     setFormState("success");
     // Brief success flash before redirect
-    setTimeout(() => router.push("/onboarding"), 1000);
+    setTimeout(() => router.push("/onboarding"), 1200);
   };
 
   const isLoading = formState === "loading";
