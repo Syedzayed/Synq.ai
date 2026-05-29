@@ -9,6 +9,7 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 interface WelcomeBannerProps {
   name?: string | null;
   isNewUser?: boolean;
+  onStart?: () => void;
 }
 
 const features = [
@@ -29,7 +30,7 @@ const features = [
   },
 ];
 
-export function WelcomeBanner({ name, isNewUser = true }: WelcomeBannerProps) {
+export function WelcomeBanner({ name, isNewUser = true, onStart }: WelcomeBannerProps) {
   const firstName = name ? name.split(" ")[0] : null;
 
   return (
@@ -154,18 +155,33 @@ export function WelcomeBanner({ name, isNewUser = true }: WelcomeBannerProps) {
         transition={{ duration: 0.5, delay: 0.55, ease: EASE }}
         className="flex flex-col items-center gap-4"
       >
-        <Link
-          id="onboarding-continue"
-          href="/onboarding/profile"
-          className="inline-flex items-center gap-2.5 rounded-full px-8 py-3.5 text-[15px] font-semibold text-white transition-all duration-200 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
-          style={{
-            background: "linear-gradient(135deg, #e07a5f 0%, #d4694f 100%)",
-            boxShadow: "0 2px 16px rgba(224,122,95,0.35)",
-          }}
-        >
-          Set up my profile
-          <ArrowRight size={16} />
-        </Link>
+        {onStart ? (
+          <button
+            id="onboarding-continue"
+            onClick={onStart}
+            className="inline-flex items-center gap-2.5 rounded-full px-8 py-3.5 text-[15px] font-semibold text-white transition-all duration-200 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+            style={{
+              background: "linear-gradient(135deg, #e07a5f 0%, #d4694f 100%)",
+              boxShadow: "0 2px 16px rgba(224,122,95,0.35)",
+            }}
+          >
+            Set up my profile
+            <ArrowRight size={16} />
+          </button>
+        ) : (
+          <Link
+            id="onboarding-continue"
+            href="/onboarding/profile"
+            className="inline-flex items-center gap-2.5 rounded-full px-8 py-3.5 text-[15px] font-semibold text-white transition-all duration-200 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+            style={{
+              background: "linear-gradient(135deg, #e07a5f 0%, #d4694f 100%)",
+              boxShadow: "0 2px 16px rgba(224,122,95,0.35)",
+            }}
+          >
+            Set up my profile
+            <ArrowRight size={16} />
+          </Link>
+        )}
 
         <p className="text-[12.5px]" style={{ color: "#b8b2aa" }}>
           Takes about 3 minutes
