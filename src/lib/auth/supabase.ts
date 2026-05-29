@@ -14,3 +14,10 @@ if (!supabaseUrl || !supabasePublishableKey) {
  * Uses the publishable key; Row Level Security (RLS) applies.
  */
 export const supabase = createClient(supabaseUrl, supabasePublishableKey);
+
+/** Signs the current user out and clears the local session. */
+export async function signOut() {
+  const { error } = await supabase.auth.signOut();
+  if (error) throw error;
+}
+
