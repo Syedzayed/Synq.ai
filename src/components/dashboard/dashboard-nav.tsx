@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { LayoutDashboard, MessageSquare, User, Sparkles, LogOut } from "lucide-react";
+import { LayoutDashboard, MessageSquare, Compass, Sparkles, LogOut } from "lucide-react";
 import { signOut } from "@/lib/auth/supabase";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard/discover", label: "Discover", icon: Compass },
   { href: "/dashboard/chat", label: "Chat", icon: MessageSquare },
 ];
 
