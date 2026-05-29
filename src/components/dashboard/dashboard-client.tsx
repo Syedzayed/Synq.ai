@@ -1,11 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  Sparkles, Zap, Heart, Target, Users, Brain,
-  ArrowRight, CheckCircle, Clock
-} from "lucide-react";
-import Link from "next/link";
+import { Zap, Heart, Target, Users, Brain, CheckCircle, Clock, Sparkles } from "lucide-react";
+
+
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -54,28 +52,9 @@ export function DashboardClient({ profile }: DashboardClientProps) {
   const firstName = profile.name.split(" ")[0];
 
   return (
-    <div className="min-h-screen" style={{ background: "#fdfbf7" }}>
-      {/* Ambient glow */}
-      <div aria-hidden="true" className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full blur-3xl opacity-15" style={{ background: "radial-gradient(ellipse, rgba(224,122,95,0.5) 0%, rgba(244,162,97,0.3) 50%, transparent 100%)" }} />
+    <div className="relative overflow-auto" style={{ minHeight: "100%" }}>
 
-      {/* Nav */}
-      <nav className="sticky top-0 z-10 backdrop-blur-sm" style={{ background: "rgba(253,251,247,0.92)", borderBottom: "1px solid rgba(232,226,216,0.7)" }}>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #e07a5f, #f4a261)" }}>
-              <Sparkles size={13} className="text-white" />
-            </div>
-            <span className="text-[15px] font-bold" style={{ color: "#1e1a17" }}>Synq</span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full flex items-center justify-center text-[13px] font-bold text-white" style={{ background: "linear-gradient(135deg, #e07a5f, #f4a261)" }}>
-              {profile.name.charAt(0).toUpperCase()}
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 relative">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 relative">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
