@@ -20,12 +20,14 @@ interface DashboardNavProps {
   userName: string;
   pendingConnectionCount?: number;
   unreadNotificationCount?: number;
+  unreadMessageCount?: number;
 }
 
 export function DashboardNav({
   userName,
   pendingConnectionCount = 0,
   unreadNotificationCount = 0,
+  unreadMessageCount = 0,
 }: DashboardNavProps) {
   const pathname = usePathname();
   const initial = userName.charAt(0).toUpperCase();
@@ -46,7 +48,13 @@ export function DashboardNav({
       icon: Bell,
       badge: unreadNotificationCount > 0 ? unreadNotificationCount : undefined,
     },
-    { href: "/dashboard/chat",         label: "Chat",          icon: MessageSquare },
+    {
+      href: "/dashboard/messages",
+      label: "Messages",
+      icon: MessageSquare,
+      badge: unreadMessageCount > 0 ? unreadMessageCount : undefined,
+    },
+    { href: "/dashboard/chat",         label: "AI Chat",       icon: MessageSquare },
     { href: "/dashboard/profile",      label: "Profile",       icon: UserCircle },
   ];
 

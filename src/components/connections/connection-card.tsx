@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Briefcase } from "lucide-react";
 import { ConnectButton } from "./connect-button";
+import { MessageButton } from "@/components/messages/message-button";
 import type { ConnectionRequest } from "@/actions/connections";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -78,6 +79,9 @@ export function ConnectionCard({ connection, currentUserId, index = 0 }: Connect
           isSender={isSender}
           size="sm"
         />
+        {status === "ACCEPTED" && (
+          <MessageButton targetUserId={otherUser.userId} size="sm" variant="outline" />
+        )}
         <Link
           href={`/dashboard/discover/${otherUser.userId}`}
           className="p-2 rounded-xl transition-colors hover:bg-[rgba(232,226,216,0.5)]"

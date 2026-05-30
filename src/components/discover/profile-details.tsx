@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { ProfileTags } from "./profile-tags";
 import { ConnectButton } from "@/components/connections/connect-button";
+import { MessageButton } from "@/components/messages/message-button";
 import type { ConnectionStatus } from "@/actions/connections";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -157,15 +158,20 @@ export function ProfileDetails({ profile, connectionStatus = null, connectionId 
             )}
           </div>
 
-          {/* Connect CTA */}
+          {/* Connect + Message CTAs */}
           {!isOwnProfile && (
-            <ConnectButton
-              targetUserId={profile.id}
-              initialStatus={connectionStatus}
-              connectionId={connectionId}
-              isSender={isSender}
-              size="md"
-            />
+            <div className="flex items-center gap-2">
+              <ConnectButton
+                targetUserId={profile.id}
+                initialStatus={connectionStatus}
+                connectionId={connectionId}
+                isSender={isSender}
+                size="md"
+              />
+              {connectionStatus === "ACCEPTED" && (
+                <MessageButton targetUserId={profile.id} size="md" variant="outline" />
+              )}
+            </div>
           )}
         </div>
 

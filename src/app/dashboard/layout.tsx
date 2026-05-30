@@ -3,6 +3,7 @@ import { getServerUser } from "@/lib/auth/supabase-server";
 import { db } from "@/lib/db/prisma";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 import { NotificationBadge } from "@/components/notifications/notification-badge";
+import { getTotalUnreadMessageCount } from "@/actions/messages";
 
 export default async function DashboardLayout({
   children,
@@ -23,9 +24,10 @@ export default async function DashboardLayout({
     profile?.name ?? user.user_metadata?.full_name ?? user.email ?? "User";
 
   // Parallel fetch of badge counts
-  const [pendingCount, unreadNotifCount] = await Promise.all([
+  const [pendingCount, unreadNotifCount, unreadMsgCount] = await Promise.all([
     db.connection.count({ where: { receiverId: user.id, status: "PENDING" } }),
     db.notification.count({ where: { userId: user.id, isRead: false } }),
+    getTotalUnreadMessageCount(),
   ]);
 
   return (
@@ -34,6 +36,7 @@ export default async function DashboardLayout({
         userName={displayName}
         pendingConnectionCount={pendingCount}
         unreadNotificationCount={unreadNotifCount}
+        unreadMessageCount={unreadMsgCount}
       />
       <main className="flex-1 overflow-auto">{children}</main>
     </div>
