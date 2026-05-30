@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { LayoutDashboard, MessageSquare, Compass, Sparkles, LogOut, Network } from "lucide-react";
+import { LayoutDashboard, MessageSquare, Compass, Sparkles, LogOut, Network, UserCircle } from "lucide-react";
 import { signOut } from "@/lib/auth/supabase";
 
 interface NavItem {
@@ -33,6 +33,7 @@ export function DashboardNav({ userName, pendingConnectionCount = 0 }: Dashboard
       badge: pendingConnectionCount > 0 ? pendingConnectionCount : undefined,
     },
     { href: "/dashboard/chat", label: "Chat", icon: MessageSquare },
+    { href: "/dashboard/profile", label: "Profile", icon: UserCircle },
   ];
 
   const handleSignOut = async () => {
@@ -102,18 +103,23 @@ export function DashboardNav({ userName, pendingConnectionCount = 0 }: Dashboard
           className="mt-4 pt-4 flex items-center gap-2.5 px-2"
           style={{ borderTop: "1px solid rgba(232,226,216,0.8)" }}
         >
-          <div
-            className="h-7 w-7 rounded-full flex items-center justify-center text-[12px] font-bold text-white flex-shrink-0"
-            style={{ background: "linear-gradient(135deg,#e07a5f,#f4a261)" }}
+          <Link
+            href="/dashboard/profile"
+            className="flex items-center gap-2.5 flex-1 min-w-0 hover:opacity-80 transition-opacity"
           >
-            {initial}
-          </div>
-          <span
-            className="text-[12.5px] font-medium flex-1 truncate"
-            style={{ color: "#3a3530" }}
-          >
-            {userName.split(" ")[0]}
-          </span>
+            <div
+              className="h-7 w-7 rounded-full flex items-center justify-center text-[12px] font-bold text-white flex-shrink-0"
+              style={{ background: "linear-gradient(135deg,#e07a5f,#f4a261)" }}
+            >
+              {initial}
+            </div>
+            <span
+              className="text-[12.5px] font-medium flex-1 truncate"
+              style={{ color: "#3a3530" }}
+            >
+              {userName.split(" ")[0]}
+            </span>
+          </Link>
           <button
             onClick={handleSignOut}
             title="Sign out"
