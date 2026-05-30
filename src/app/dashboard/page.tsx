@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getServerUser } from "@/lib/auth/supabase-server";
 import { db } from "@/lib/db/prisma";
+import { getRecommendations } from "@/lib/match/recommendation-service";
 import { DashboardClient } from "@/components/dashboard/dashboard-client";
 
 export const metadata: Metadata = {
@@ -21,6 +22,9 @@ export default async function DashboardPage() {
     },
   });
 
+  // Fetch top 3 recommendations for the widget (fast DB read, no AI call)
+  const topMatches = await getRecommendations(user!.id, 3);
+
   return (
     <DashboardClient
       profile={{
@@ -33,6 +37,7 @@ export default async function DashboardPage() {
         lookingFor: profile?.lookingFor ?? [],
         aiSummary: profile?.aiSummary ?? null,
       }}
+      topMatches={topMatches}
     />
   );
 }

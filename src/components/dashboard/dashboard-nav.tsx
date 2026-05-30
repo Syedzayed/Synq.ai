@@ -9,6 +9,7 @@ import { signOut } from "@/lib/auth/supabase";
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/discover", label: "Discover", icon: Compass },
+  { href: "/dashboard/matches", label: "Matches", icon: Sparkles },
   { href: "/dashboard/chat", label: "Chat", icon: MessageSquare },
 ];
 

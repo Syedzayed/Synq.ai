@@ -4,14 +4,12 @@ import { getRecommendations } from "@/lib/match/recommendation-service";
 import { DiscoverMatchesClient } from "@/components/matches/discover-matches-client";
 
 export const metadata: Metadata = {
-  title: "Discover — Synq",
-  description: "Your AI-powered recommended connections on Synq.",
+  title: "Matches — Synq",
+  description: "Your full AI-powered match list on Synq.",
 };
 
-export default async function DiscoverPage() {
+export default async function MatchesPage() {
   const user = await getServerUser();
-
-  // Load stored recommendations (fast, DB read only)
   const recommendations = await getRecommendations(user!.id, 10);
 
   return (
@@ -22,7 +20,7 @@ export default async function DiscoverPage() {
           className="text-[11px] font-bold uppercase tracking-[0.2em] mb-2"
           style={{ color: "#e07a5f" }}
         >
-          Discover
+          AI Matchmaking
         </p>
         <h1
           style={{
@@ -34,10 +32,10 @@ export default async function DiscoverPage() {
             lineHeight: 1.1,
           }}
         >
-          Recommended Connections
+          Your Matches
         </h1>
         <p className="mt-2 text-[15px]" style={{ color: "#6b6560" }}>
-          Intelligent matches powered by AI — ranked by compatibility.
+          Powered by Mistral AI — scored across skills, interests, goals &amp; embeddings.
         </p>
       </div>
 

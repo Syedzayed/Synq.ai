@@ -1,9 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Zap, Heart, Target, Users, Brain, CheckCircle, Clock, Sparkles } from "lucide-react";
-
-
+import { Zap, Heart, Target, Users, Brain, CheckCircle } from "lucide-react";
+import { TopMatchesWidget } from "@/components/matches/top-matches-widget";
+import type { StoredRecommendation } from "@/lib/match/recommendation-service";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -20,6 +20,7 @@ interface DashboardProfile {
 
 interface DashboardClientProps {
   profile: DashboardProfile;
+  topMatches: StoredRecommendation[];
 }
 
 function StatCard({ icon: Icon, label, count }: { icon: React.ElementType; label: string; count: number }) {
@@ -48,7 +49,7 @@ function TagBadge({ text }: { text: string }) {
   );
 }
 
-export function DashboardClient({ profile }: DashboardClientProps) {
+export function DashboardClient({ profile, topMatches }: DashboardClientProps) {
   const firstName = profile.name.split(" ")[0];
 
   return (
@@ -164,28 +165,8 @@ export function DashboardClient({ profile }: DashboardClientProps) {
               </div>
             </motion.div>
 
-            {/* Connections coming soon */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.35, ease: EASE }}
-              className="rounded-2xl p-6 flex flex-col items-center justify-center text-center min-h-[180px]"
-              style={{ background: "rgba(255,252,248,0.98)", border: "1.5px dashed rgba(232,226,216,0.9)" }}
-            >
-              <div className="h-12 w-12 rounded-2xl flex items-center justify-center mb-3" style={{ background: "rgba(224,122,95,0.08)" }}>
-                <Clock size={20} style={{ color: "#e07a5f" }} />
-              </div>
-              <p className="text-[15px] font-semibold mb-1.5" style={{ color: "#1e1a17" }}>
-                Connections coming soon
-              </p>
-              <p className="text-[13px] max-w-xs" style={{ color: "#9e9890" }}>
-                Synq AI is analyzing your semantic profile and will surface your first intelligent matches shortly.
-              </p>
-              <div className="mt-4 flex items-center gap-1.5 text-[12px] font-medium" style={{ color: "#e07a5f" }}>
-                <Sparkles size={12} />
-                Powered by Mistral embedding similarity
-              </div>
-            </motion.div>
+            {/* Top Matches Widget */}
+            <TopMatchesWidget matches={topMatches} />
           </div>
         </div>
       </main>
