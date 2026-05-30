@@ -4,7 +4,9 @@ import { motion } from "framer-motion";
 import { Zap, Heart, Target, Users, Brain, CheckCircle } from "lucide-react";
 import { TopMatchesWidget } from "@/components/matches/top-matches-widget";
 import { ConnectionActivityWidget } from "@/components/connections/connection-activity-widget";
+import { ActivityWidget } from "@/components/notifications/activity-widget";
 import type { StoredRecommendation } from "@/lib/match/recommendation-service";
+import type { NotificationItem } from "@/actions/notifications";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -24,6 +26,7 @@ interface DashboardClientProps {
   topMatches: StoredRecommendation[];
   pendingConnectionCount: number;
   acceptedConnectionCount: number;
+  recentNotifications: NotificationItem[];
 }
 
 function StatCard({ icon: Icon, label, count }: { icon: React.ElementType; label: string; count: number }) {
@@ -52,7 +55,7 @@ function TagBadge({ text }: { text: string }) {
   );
 }
 
-export function DashboardClient({ profile, topMatches, pendingConnectionCount, acceptedConnectionCount }: DashboardClientProps) {
+export function DashboardClient({ profile, topMatches, pendingConnectionCount, acceptedConnectionCount, recentNotifications }: DashboardClientProps) {
   const firstName = profile.name.split(" ")[0];
 
   return (
@@ -176,6 +179,9 @@ export function DashboardClient({ profile, topMatches, pendingConnectionCount, a
               pendingCount={pendingConnectionCount}
               acceptedCount={acceptedConnectionCount}
             />
+
+            {/* Recent Activity Widget */}
+            <ActivityWidget notifications={recentNotifications} />
           </div>
         </div>
       </main>

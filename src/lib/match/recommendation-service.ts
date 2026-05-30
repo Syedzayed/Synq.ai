@@ -11,6 +11,7 @@
 import { db } from "@/lib/db/prisma";
 import { chatCompletion } from "@/lib/ai/mistral";
 import { rankCandidates, type RankedMatch } from "./match-engine";
+import { createNotification } from "@/actions/notifications";
 
 const TOP_K = 10;
 
@@ -152,7 +153,7 @@ export async function generateRecommendations(currentUserId: string): Promise<vo
 
     const reason = await generateExplanation(meSnapshot, themSnapshot, candidate.score.total);
 
-    await db.matchRecommendation.upsert({
+    const result = await db.matchRecommendation.upsert({
       where: {
         userId_matchedUserId: {
           userId: currentUserId,
@@ -171,6 +172,18 @@ export async function generateRecommendations(currentUserId: string): Promise<vo
         createdAt: new Date(),
       },
     });
+
+    // Fire a NEW_MATCH notification for high-compatibility matches (≥75%)
+    if (candidate.score.total >= 75) {
+      await createNotification({
+        userId: currentUserId,
+        type: "NEW_MATCH",
+        title: "New High-Compatibility Match",
+        message: `You have a ${Math.round(candidate.score.total)}% match with ${candidate.name ?? "someone"}. Check it out!`,
+        relatedUserId: candidate.userId,
+        relatedEntityId: result.id,
+      });
+    }
   }
 }
 

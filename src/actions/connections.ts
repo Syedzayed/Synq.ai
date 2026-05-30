@@ -14,6 +14,7 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db/prisma";
 import { getServerUser } from "@/lib/auth/supabase-server";
+import { createNotification } from "./notifications";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -93,6 +94,20 @@ export async function sendConnectionRequest(
       update: { status: "PENDING", updatedAt: new Date() },
     });
 
+    // Notify the receiver
+    const senderProfile = await db.profile.findUnique({
+      where: { userId: user.id },
+      select: { name: true },
+    });
+    const senderName = senderProfile?.name ?? "Someone";
+    await createNotification({
+      userId: receiverId,
+      type: "CONNECTION_REQUEST",
+      title: "New Connection Request",
+      message: `${senderName} wants to connect with you.`,
+      relatedUserId: user.id,
+    });
+
     revalidatePath("/dashboard/connections");
     revalidatePath("/dashboard/discover");
     revalidatePath(`/dashboard/discover/${receiverId}`);
@@ -118,6 +133,21 @@ export async function acceptConnectionRequest(
   await db.connection.update({
     where: { id: connectionId },
     data: { status: "ACCEPTED", updatedAt: new Date() },
+  });
+
+  // Notify the original sender that their request was accepted
+  const accepterProfile = await db.profile.findUnique({
+    where: { userId: user.id },
+    select: { name: true },
+  });
+  const accepterName = accepterProfile?.name ?? "Someone";
+  await createNotification({
+    userId: connection.senderId,
+    type: "CONNECTION_ACCEPTED",
+    title: "Connection Accepted",
+    message: `${accepterName} accepted your connection request.`,
+    relatedUserId: user.id,
+    relatedEntityId: connectionId,
   });
 
   revalidatePath("/dashboard/connections");

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getServerUser } from "@/lib/auth/supabase-server";
 import { db } from "@/lib/db/prisma";
 import { getRecommendations } from "@/lib/match/recommendation-service";
+import { getUserNotifications } from "@/actions/notifications";
 import { DashboardClient } from "@/components/dashboard/dashboard-client";
 
 export const metadata: Metadata = {
@@ -21,7 +22,7 @@ export default async function DashboardPage() {
     },
   });
 
-  const [topMatches, pendingCount, acceptedCount] = await Promise.all([
+  const [topMatches, pendingCount, acceptedCount, notifData] = await Promise.all([
     getRecommendations(user!.id, 3),
     db.connection.count({ where: { receiverId: user!.id, status: "PENDING" } }),
     db.connection.count({
@@ -30,6 +31,7 @@ export default async function DashboardPage() {
         status: "ACCEPTED",
       },
     }),
+    getUserNotifications(10),
   ]);
 
   return (
@@ -47,6 +49,7 @@ export default async function DashboardPage() {
       topMatches={topMatches}
       pendingConnectionCount={pendingCount}
       acceptedConnectionCount={acceptedCount}
+      recentNotifications={[...notifData.unread, ...notifData.read]}
     />
   );
 }

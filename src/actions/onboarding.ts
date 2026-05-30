@@ -16,6 +16,7 @@ import { db } from "@/lib/db/prisma";
 import { createSupabaseServerClient } from "@/lib/auth/supabase-server";
 import { generateProfileSummary } from "@/lib/ai/summarizer";
 import { generateProfileEmbedding } from "@/lib/ai/embeddings";
+import { createNotification } from "./notifications";
 
 export interface OnboardingData {
   name: string;
@@ -133,6 +134,14 @@ export async function completeOnboarding(
   await db.user.update({
     where: { id: user.id },
     data: { name: data.name.trim() },
+  });
+
+  // Welcome notification
+  await createNotification({
+    userId: user.id,
+    type: "SYSTEM",
+    title: "Welcome to Synq!",
+    message: "Your profile is live. Explore your AI-powered matches and start connecting.",
   });
 
   return { success: true, aiSummary: aiSummary ?? undefined };
