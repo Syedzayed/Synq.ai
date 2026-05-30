@@ -3,9 +3,9 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db/prisma";
 import { getServerUser } from "@/lib/auth/supabase-server";
 import { getMatchDetails } from "@/lib/match/recommendation-service";
+import { getConnectionStatus } from "@/actions/connections";
 import { ProfileDetails } from "@/components/discover/profile-details";
 import { CompatibilityAnalysis, OverlapTags } from "@/components/matches/compatibility-analysis";
-import { ProfileTags } from "@/components/discover/profile-tags";
 import { Zap, Heart, Target, Users } from "lucide-react";
 
 interface Props {
@@ -49,23 +49,20 @@ export default async function ProfilePage({ params }: Props) {
 
   if (!profile) notFound();
 
-  // Get current user and match details
+  // Get current user, match details, and connection status
   const currentUser = await getServerUser();
   const isOwnProfile = currentUser?.id === userId;
 
-  const matchDetails =
+  const [matchDetails, connectionData, myProfile] = await Promise.all([
+    currentUser && !isOwnProfile ? getMatchDetails(currentUser.id, userId) : Promise.resolve(null),
+    currentUser && !isOwnProfile ? getConnectionStatus(userId) : Promise.resolve(null),
     currentUser && !isOwnProfile
-      ? await getMatchDetails(currentUser.id, userId)
-      : null;
-
-  // Fetch current user's profile for overlap computation
-  const myProfile =
-    currentUser && !isOwnProfile
-      ? await db.profile.findUnique({
+      ? db.profile.findUnique({
           where: { userId: currentUser.id },
           select: { skills: true, interests: true, goals: true, lookingFor: true },
         })
-      : null;
+      : Promise.resolve(null),
+  ]);
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
@@ -83,6 +80,10 @@ export default async function ProfilePage({ params }: Props) {
           goals: profile.goals,
           lookingFor: profile.lookingFor,
         }}
+        connectionStatus={connectionData?.status ?? null}
+        connectionId={connectionData?.connectionId ?? null}
+        isSender={connectionData?.isSender ?? true}
+        isOwnProfile={isOwnProfile}
       />
 
       {/* Match Analysis — only shown when viewing another user's profile */}

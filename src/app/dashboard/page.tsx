@@ -9,7 +9,6 @@ export const metadata: Metadata = {
   description: "Your Synq dashboard. View your profile and upcoming connections.",
 };
 
-// Auth + completion guards are handled by the layout — page just fetches data.
 export default async function DashboardPage() {
   const user = await getServerUser();
 
@@ -22,8 +21,16 @@ export default async function DashboardPage() {
     },
   });
 
-  // Fetch top 3 recommendations for the widget (fast DB read, no AI call)
-  const topMatches = await getRecommendations(user!.id, 3);
+  const [topMatches, pendingCount, acceptedCount] = await Promise.all([
+    getRecommendations(user!.id, 3),
+    db.connection.count({ where: { receiverId: user!.id, status: "PENDING" } }),
+    db.connection.count({
+      where: {
+        OR: [{ senderId: user!.id }, { receiverId: user!.id }],
+        status: "ACCEPTED",
+      },
+    }),
+  ]);
 
   return (
     <DashboardClient
@@ -38,6 +45,8 @@ export default async function DashboardPage() {
         aiSummary: profile?.aiSummary ?? null,
       }}
       topMatches={topMatches}
+      pendingConnectionCount={pendingCount}
+      acceptedConnectionCount={acceptedCount}
     />
   );
 }

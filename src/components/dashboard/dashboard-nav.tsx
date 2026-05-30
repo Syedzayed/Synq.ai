@@ -3,23 +3,37 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { LayoutDashboard, MessageSquare, Compass, Sparkles, LogOut } from "lucide-react";
+import { LayoutDashboard, MessageSquare, Compass, Sparkles, LogOut, Network } from "lucide-react";
 import { signOut } from "@/lib/auth/supabase";
 
-const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/discover", label: "Discover", icon: Compass },
-  { href: "/dashboard/matches", label: "Matches", icon: Sparkles },
-  { href: "/dashboard/chat", label: "Chat", icon: MessageSquare },
-];
+interface NavItem {
+  href: string;
+  label: string;
+  icon: React.ElementType;
+  badge?: number;
+}
 
 interface DashboardNavProps {
   userName: string;
+  pendingConnectionCount?: number;
 }
 
-export function DashboardNav({ userName }: DashboardNavProps) {
+export function DashboardNav({ userName, pendingConnectionCount = 0 }: DashboardNavProps) {
   const pathname = usePathname();
   const initial = userName.charAt(0).toUpperCase();
+
+  const NAV_ITEMS: NavItem[] = [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/dashboard/discover", label: "Discover", icon: Compass },
+    { href: "/dashboard/matches", label: "Matches", icon: Sparkles },
+    {
+      href: "/dashboard/connections",
+      label: "Connections",
+      icon: Network,
+      badge: pendingConnectionCount > 0 ? pendingConnectionCount : undefined,
+    },
+    { href: "/dashboard/chat", label: "Chat", icon: MessageSquare },
+  ];
 
   const handleSignOut = async () => {
     await signOut();
@@ -48,7 +62,7 @@ export function DashboardNav({ userName }: DashboardNavProps) {
 
         {/* Nav links */}
         <nav className="flex flex-col gap-1 flex-1">
-          {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+          {NAV_ITEMS.map(({ href, label, icon: Icon, badge }) => {
             const active =
               href === "/dashboard"
                 ? pathname === "/dashboard"
@@ -69,7 +83,15 @@ export function DashboardNav({ userName }: DashboardNavProps) {
                   />
                 )}
                 <Icon size={15} className="relative" />
-                <span className="relative">{label}</span>
+                <span className="relative flex-1">{label}</span>
+                {badge != null && (
+                  <span
+                    className="relative h-5 min-w-5 px-1 rounded-full text-[10px] font-bold flex items-center justify-center"
+                    style={{ background: "#e07a5f", color: "white" }}
+                  >
+                    {badge}
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -104,14 +126,14 @@ export function DashboardNav({ userName }: DashboardNavProps) {
 
       {/* Mobile bottom nav */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around px-4 py-2"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around px-2 py-2"
         style={{
           background: "rgba(253,251,247,0.95)",
           borderTop: "1px solid rgba(232,226,216,0.9)",
           backdropFilter: "blur(12px)",
         }}
       >
-        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+        {NAV_ITEMS.map(({ href, label, icon: Icon, badge }) => {
           const active =
             href === "/dashboard"
               ? pathname === "/dashboard"
@@ -120,10 +142,20 @@ export function DashboardNav({ userName }: DashboardNavProps) {
             <Link
               key={href}
               href={href}
-              className="flex flex-col items-center gap-1 py-1 px-4"
+              className="relative flex flex-col items-center gap-1 py-1 px-3"
               style={{ color: active ? "#e07a5f" : "#9e9890" }}
             >
-              <Icon size={18} />
+              <div className="relative">
+                <Icon size={18} />
+                {badge != null && (
+                  <span
+                    className="absolute -top-1 -right-1.5 h-4 min-w-4 px-0.5 rounded-full text-[9px] font-bold flex items-center justify-center"
+                    style={{ background: "#e07a5f", color: "white" }}
+                  >
+                    {badge}
+                  </span>
+                )}
+              </div>
               <span className="text-[10px] font-medium">{label}</span>
             </Link>
           );

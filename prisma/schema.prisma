@@ -7,6 +7,12 @@ datasource db {
   // ⚠️ Prisma 7: URL is configured in prisma.config.ts — NOT here.
 }
 
+enum ConnectionStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -14,12 +20,30 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  profile         Profile?
-  conversations   Conversation[]
-  matches         MatchRecommendation[] @relation("UserMatches")
-  matchedBy       MatchRecommendation[] @relation("MatchedByUser")
+  profile           Profile?
+  conversations     Conversation[]
+  matches           MatchRecommendation[] @relation("UserMatches")
+  matchedBy         MatchRecommendation[] @relation("MatchedByUser")
+  sentConnections   Connection[]          @relation("ConnectionSender")
+  receivedConnections Connection[]        @relation("ConnectionReceiver")
 
   @@map("users")
+}
+
+model Connection {
+  id         String           @id @default(cuid())
+  senderId   String
+  receiverId String
+  status     ConnectionStatus @default(PENDING)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  sender   User @relation("ConnectionSender",   fields: [senderId],   references: [id], onDelete: Cascade)
+  receiver User @relation("ConnectionReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  // Prevent duplicate active requests between the same pair
+  @@unique([senderId, receiverId])
+  @@map("connections")
 }
 
 model Profile {

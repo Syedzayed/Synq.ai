@@ -4,13 +4,24 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { RecommendedGrid } from "@/components/matches/recommended-grid";
 import type { StoredRecommendation } from "@/lib/match/recommendation-service";
+import type { ConnectionStatus } from "@/actions/connections";
+
+export type ConnectionMapEntry = {
+  status: ConnectionStatus;
+  connectionId: string;
+  isSender: boolean;
+};
 
 interface DiscoverMatchesClientProps {
   initialRecommendations: StoredRecommendation[];
+  connectionMap?: Record<string, ConnectionMapEntry>;
 }
 
-export function DiscoverMatchesClient({ initialRecommendations }: DiscoverMatchesClientProps) {
-  const [recommendations, setRecommendations] = useState(initialRecommendations);
+export function DiscoverMatchesClient({
+  initialRecommendations,
+  connectionMap = {},
+}: DiscoverMatchesClientProps) {
+  const [recommendations] = useState(initialRecommendations);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -28,6 +39,7 @@ export function DiscoverMatchesClient({ initialRecommendations }: DiscoverMatche
   return (
     <RecommendedGrid
       recommendations={recommendations}
+      connectionMap={connectionMap}
       onRegenerate={handleRegenerate}
       isRegenerating={isPending}
     />

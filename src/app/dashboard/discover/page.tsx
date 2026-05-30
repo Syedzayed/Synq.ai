@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getServerUser } from "@/lib/auth/supabase-server";
 import { getRecommendations } from "@/lib/match/recommendation-service";
+import { db } from "@/lib/db/prisma";
 import { DiscoverMatchesClient } from "@/components/matches/discover-matches-client";
 
 export const metadata: Metadata = {
@@ -11,8 +12,32 @@ export const metadata: Metadata = {
 export default async function DiscoverPage() {
   const user = await getServerUser();
 
-  // Load stored recommendations (fast, DB read only)
-  const recommendations = await getRecommendations(user!.id, 10);
+  // Fetch recommendations + all connections for this user in parallel
+  const [recommendations, connections] = await Promise.all([
+    getRecommendations(user!.id, 10),
+    db.connection.findMany({
+      where: {
+        OR: [{ senderId: user!.id }, { receiverId: user!.id }],
+      },
+      select: { senderId: true, receiverId: true, status: true, id: true },
+    }),
+  ]);
+
+  // Build a lookup: otherUserId → { status, connectionId, isSender }
+  const connectionMap: Record<
+    string,
+    { status: "PENDING" | "ACCEPTED" | "REJECTED"; connectionId: string; isSender: boolean }
+  > = {};
+
+  for (const c of connections) {
+    const isMe = c.senderId === user!.id;
+    const otherId = isMe ? c.receiverId : c.senderId;
+    connectionMap[otherId] = {
+      status: c.status as "PENDING" | "ACCEPTED" | "REJECTED",
+      connectionId: c.id,
+      isSender: isMe,
+    };
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
@@ -41,7 +66,10 @@ export default async function DiscoverPage() {
         </p>
       </div>
 
-      <DiscoverMatchesClient initialRecommendations={recommendations} />
+      <DiscoverMatchesClient
+        initialRecommendations={recommendations}
+        connectionMap={connectionMap}
+      />
     </div>
   );
 }

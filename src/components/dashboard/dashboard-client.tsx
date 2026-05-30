@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Zap, Heart, Target, Users, Brain, CheckCircle } from "lucide-react";
 import { TopMatchesWidget } from "@/components/matches/top-matches-widget";
+import { ConnectionActivityWidget } from "@/components/connections/connection-activity-widget";
 import type { StoredRecommendation } from "@/lib/match/recommendation-service";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -21,6 +22,8 @@ interface DashboardProfile {
 interface DashboardClientProps {
   profile: DashboardProfile;
   topMatches: StoredRecommendation[];
+  pendingConnectionCount: number;
+  acceptedConnectionCount: number;
 }
 
 function StatCard({ icon: Icon, label, count }: { icon: React.ElementType; label: string; count: number }) {
@@ -49,7 +52,7 @@ function TagBadge({ text }: { text: string }) {
   );
 }
 
-export function DashboardClient({ profile, topMatches }: DashboardClientProps) {
+export function DashboardClient({ profile, topMatches, pendingConnectionCount, acceptedConnectionCount }: DashboardClientProps) {
   const firstName = profile.name.split(" ")[0];
 
   return (
@@ -167,6 +170,12 @@ export function DashboardClient({ profile, topMatches }: DashboardClientProps) {
 
             {/* Top Matches Widget */}
             <TopMatchesWidget matches={topMatches} />
+
+            {/* Connection Activity Widget */}
+            <ConnectionActivityWidget
+              pendingCount={pendingConnectionCount}
+              acceptedCount={acceptedConnectionCount}
+            />
           </div>
         </div>
       </main>

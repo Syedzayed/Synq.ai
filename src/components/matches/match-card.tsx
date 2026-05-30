@@ -2,15 +2,20 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, UserPlus, Briefcase } from "lucide-react";
+import { ArrowRight, Briefcase } from "lucide-react";
 import { ProfileTags } from "@/components/discover/profile-tags";
 import { MatchScore } from "./match-score";
 import { MatchExplanation } from "./match-explanation";
+import { ConnectButton } from "@/components/connections/connect-button";
 import type { StoredRecommendation } from "@/lib/match/recommendation-service";
+import type { ConnectionStatus } from "@/actions/connections";
 
 interface MatchCardProps {
   recommendation: StoredRecommendation;
   index?: number;
+  initialConnectionStatus?: ConnectionStatus | null;
+  connectionId?: string | null;
+  isSender?: boolean;
 }
 
 function avatarGradient(name: string) {
@@ -24,7 +29,7 @@ function avatarGradient(name: string) {
   return gradients[(name.charCodeAt(0) ?? 65) % gradients.length];
 }
 
-export function MatchCard({ recommendation, index = 0 }: MatchCardProps) {
+export function MatchCard({ recommendation, index = 0, initialConnectionStatus = null, connectionId = null, isSender = true }: MatchCardProps) {
   const { matchedUserId, score, reason, matchedProfile } = recommendation;
   const name = matchedProfile.name ?? "Anonymous";
   const initial = name.charAt(0).toUpperCase();
@@ -111,19 +116,13 @@ export function MatchCard({ recommendation, index = 0 }: MatchCardProps) {
             View Profile
             <ArrowRight size={13} />
           </Link>
-          <button
-            type="button"
-            title="Connect (coming soon)"
-            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl text-[13px] font-semibold transition-colors"
-            style={{
-              background: "#f8f4ef",
-              color: "#9e9890",
-              border: "1px solid rgba(232,226,216,0.9)",
-            }}
-          >
-            <UserPlus size={13} />
-            Connect
-          </button>
+          <ConnectButton
+            targetUserId={matchedUserId}
+            initialStatus={initialConnectionStatus}
+            connectionId={connectionId}
+            isSender={isSender}
+            size="sm"
+          />
         </div>
       </div>
     </motion.article>

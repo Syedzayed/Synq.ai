@@ -5,15 +5,18 @@ import Link from "next/link";
 import { Users, Sparkles, ArrowRight } from "lucide-react";
 import { MatchCard } from "./match-card";
 import type { StoredRecommendation } from "@/lib/match/recommendation-service";
+import type { ConnectionMapEntry } from "./discover-matches-client";
 
 interface RecommendedGridProps {
   recommendations: StoredRecommendation[];
+  connectionMap?: Record<string, ConnectionMapEntry>;
   onRegenerate?: () => void;
   isRegenerating?: boolean;
 }
 
 export function RecommendedGrid({
   recommendations,
+  connectionMap = {},
   onRegenerate,
   isRegenerating = false,
 }: RecommendedGridProps) {
@@ -142,9 +145,19 @@ export function RecommendedGrid({
 
       {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-        {recommendations.map((rec, i) => (
-          <MatchCard key={rec.matchedUserId} recommendation={rec} index={i} />
-        ))}
+        {recommendations.map((rec, i) => {
+          const conn = connectionMap[rec.matchedUserId];
+          return (
+            <MatchCard
+              key={rec.matchedUserId}
+              recommendation={rec}
+              index={i}
+              initialConnectionStatus={conn?.status ?? null}
+              connectionId={conn?.connectionId ?? null}
+              isSender={conn?.isSender ?? true}
+            />
+          );
+        })}
       </div>
     </div>
   );

@@ -3,10 +3,12 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import {
-  ArrowLeft, UserPlus, Zap, Heart, Target,
-  Users, FolderOpen, Brain, MapPin, Briefcase,
+  ArrowLeft, Zap, Heart, Target,
+  Users, FolderOpen, Brain, Briefcase,
 } from "lucide-react";
 import { ProfileTags } from "./profile-tags";
+import { ConnectButton } from "@/components/connections/connect-button";
+import type { ConnectionStatus } from "@/actions/connections";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -74,9 +76,13 @@ export interface FullProfile {
 
 interface ProfileDetailsProps {
   profile: FullProfile;
+  connectionStatus?: ConnectionStatus | null;
+  connectionId?: string | null;
+  isSender?: boolean;
+  isOwnProfile?: boolean;
 }
 
-export function ProfileDetails({ profile }: ProfileDetailsProps) {
+export function ProfileDetails({ profile, connectionStatus = null, connectionId = null, isSender = true, isOwnProfile = false }: ProfileDetailsProps) {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
       {/* Back */}
@@ -152,18 +158,15 @@ export function ProfileDetails({ profile }: ProfileDetailsProps) {
           </div>
 
           {/* Connect CTA */}
-          <button
-            type="button"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[13.5px] font-semibold transition-colors"
-            style={{
-              background: "#f8f4ef",
-              color: "#9e9890",
-              border: "1px solid rgba(232,226,216,0.9)",
-            }}
-          >
-            <UserPlus size={14} />
-            Connect
-          </button>
+          {!isOwnProfile && (
+            <ConnectButton
+              targetUserId={profile.id}
+              initialStatus={connectionStatus}
+              connectionId={connectionId}
+              isSender={isSender}
+              size="md"
+            />
+          )}
         </div>
 
         {/* AI Summary */}
