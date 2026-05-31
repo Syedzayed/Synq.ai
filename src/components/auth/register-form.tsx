@@ -131,6 +131,9 @@ export function RegisterForm() {
       email: data.email,
       password: data.password,
       options: {
+        emailRedirectTo: typeof window !== "undefined"
+          ? `${window.location.origin}/login`
+          : "https://synq-ai-ten.vercel.app/login",
         data: {
           full_name: data.name,
         },
