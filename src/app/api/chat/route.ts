@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
               role: "assistant",
               content: fullContent,
             },
-          }).catch((e) => console.error("[chat/route] Failed to save AI msg:", e));
+          }).catch((e: any) => console.error("[chat/route] Failed to save AI msg:", e));
         }
         controller.close();
       }
