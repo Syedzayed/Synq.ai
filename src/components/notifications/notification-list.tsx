@@ -111,7 +111,7 @@ export function NotificationList({ data: initialData }: NotificationListProps) {
             </div>
             <div className="text-center">
               <p className="text-[14.5px] font-semibold" style={{ color: "#1e1a17" }}>
-                {activeTab === "unread" ? "You're all caught up!" : "No read notifications yet."}
+                {activeTab === "unread" ? "Nothing new right now." : "No read notifications yet."}
               </p>
               <p className="text-[13px] mt-1" style={{ color: "#9e9890" }}>
                 {activeTab === "unread"

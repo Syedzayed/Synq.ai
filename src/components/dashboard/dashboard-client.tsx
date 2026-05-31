@@ -27,6 +27,20 @@ interface DashboardClientProps {
   pendingConnectionCount: number;
   acceptedConnectionCount: number;
   recentNotifications: NotificationItem[];
+  analytics: {
+    user: {
+      completeness: number;
+      totalConnections: number;
+      pendingRequests: number;
+      conversations: number;
+      aiMatchCount: number;
+    };
+    platform: {
+      activeUsers: number;
+      commonSkills: string[];
+      commonInterests: string[];
+    };
+  };
 }
 
 function StatCard({ icon: Icon, label, count }: { icon: React.ElementType; label: string; count: number }) {
@@ -55,7 +69,14 @@ function TagBadge({ text }: { text: string }) {
   );
 }
 
-export function DashboardClient({ profile, topMatches, pendingConnectionCount, acceptedConnectionCount, recentNotifications }: DashboardClientProps) {
+export function DashboardClient({ 
+  profile, 
+  topMatches, 
+  pendingConnectionCount, 
+  acceptedConnectionCount, 
+  recentNotifications,
+  analytics
+}: DashboardClientProps) {
   const firstName = profile.name.split(" ")[0];
 
   return (
@@ -134,10 +155,87 @@ export function DashboardClient({ profile, topMatches, pendingConnectionCount, a
               <StatCard icon={Target} label="Goals" count={profile.goals.length} />
               <StatCard icon={Users} label="Looking For" count={profile.lookingFor.length} />
             </motion.div>
+
+            {/* Platform Trends Widget (Bento) */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.25, ease: EASE }}
+              className="rounded-2xl p-5 space-y-4"
+              style={{ background: "rgba(255,252,248,0.98)", border: "1px solid rgba(232,226,216,0.9)", boxShadow: "0 2px 12px rgba(58,53,48,0.05)" }}
+            >
+              <p className="text-[12px] font-bold uppercase tracking-[0.1em] text-neutral-400">Platform Analytics</p>
+              
+              <div className="space-y-3">
+                <div className="flex justify-between items-center text-[13.5px]">
+                  <span className="text-neutral-500 font-medium">Active Users</span>
+                  <span className="font-bold text-neutral-800">{analytics.platform.activeUsers}</span>
+                </div>
+                
+                <div className="space-y-1.5">
+                  <span className="text-[12px] font-semibold text-neutral-400 block uppercase">Trending Skills</span>
+                  <div className="flex flex-wrap gap-1">
+                    {analytics.platform.commonSkills.map(s => (
+                      <span key={s} className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-[#FDFBF7] text-[#e07a5f] border border-[#e8e2d8]">{s}</span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <span className="text-[12px] font-semibold text-neutral-400 block uppercase">Trending Interests</span>
+                  <div className="flex flex-wrap gap-1">
+                    {analytics.platform.commonInterests.map(i => (
+                      <span key={i} className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-[#FDFBF7] text-[#f4a261] border border-[#e8e2d8]">{i}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
 
           {/* Right column — activity + coming soon */}
           <div className="lg:col-span-2 flex flex-col gap-4">
+            
+            {/* User Analytics / Completeness Widget */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.15, ease: EASE }}
+              className="rounded-2xl p-5 space-y-4"
+              style={{ background: "rgba(255,252,248,0.98)", border: "1px solid rgba(232,226,216,0.9)", boxShadow: "0 2px 12px rgba(58,53,48,0.05)" }}
+            >
+              <div className="flex justify-between items-center">
+                <p className="text-[12px] font-bold uppercase tracking-[0.1em] text-neutral-400">Profile Completeness</p>
+                <span className="text-[13px] font-bold text-[#e07a5f]">{analytics.user.completeness}%</span>
+              </div>
+              {/* Progress bar */}
+              <div className="w-full h-2 bg-neutral-100 rounded-full overflow-hidden">
+                <div 
+                  className="h-full rounded-full transition-all duration-500" 
+                  style={{ 
+                    width: `${analytics.user.completeness}%`,
+                    background: "linear-gradient(90deg, #e07a5f, #f4a261)"
+                  }}
+                />
+              </div>
+
+              {/* Stats overview */}
+              <div className="grid grid-cols-3 gap-2 pt-2 text-center">
+                <div className="p-3 bg-[#FDFBF7] rounded-xl border border-neutral-100">
+                  <p className="text-[18px] font-bold text-neutral-800">{analytics.user.conversations}</p>
+                  <p className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">Conversations</p>
+                </div>
+                <div className="p-3 bg-[#FDFBF7] rounded-xl border border-neutral-100">
+                  <p className="text-[18px] font-bold text-neutral-800">{analytics.user.aiMatchCount}</p>
+                  <p className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">AI Matches</p>
+                </div>
+                <div className="p-3 bg-[#FDFBF7] rounded-xl border border-neutral-100">
+                  <p className="text-[18px] font-bold text-neutral-800">{analytics.user.totalConnections}</p>
+                  <p className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">Connections</p>
+                </div>
+              </div>
+            </motion.div>
+
             {/* AI Summary card */}
             {profile.aiSummary && (
               <motion.div
@@ -188,3 +286,4 @@ export function DashboardClient({ profile, topMatches, pendingConnectionCount, a
     </div>
   );
 }
+

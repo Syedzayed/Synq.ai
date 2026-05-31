@@ -51,16 +51,15 @@ export function RecommendedGrid({
           className="mb-2"
           style={{
             fontFamily: "Instrument Serif, ui-serif, Georgia, serif",
-            fontSize: "1.6rem",
+            fontSize: "1.8rem",
             color: "#1e1a17",
             fontWeight: 400,
           }}
         >
-          Your network is still growing.
+          No matches found yet.
         </h2>
         <p className="text-[14px] max-w-sm mb-6" style={{ color: "#9e9890" }}>
-          Invite more people to unlock intelligent recommendations. As your network expands,
-          Synq AI will surface your best connections.
+          Invite more people or update your profile details to unlock intelligent recommendations.
         </p>
 
         {onRegenerate && (

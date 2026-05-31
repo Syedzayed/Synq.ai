@@ -22,7 +22,28 @@ export default async function DashboardPage() {
     },
   });
 
-  const [topMatches, pendingCount, acceptedCount, notifData] = await Promise.all([
+  // Calculate profile completeness score
+  let completeness = 0;
+  if (profile) {
+    if (profile.name?.trim()) completeness += 15;
+    if (profile.role?.trim()) completeness += 15;
+    if (profile.organization?.trim()) completeness += 10;
+    if (profile.skills && profile.skills.length > 0) completeness += 20;
+    if (profile.interests && profile.interests.length > 0) completeness += 15;
+    if (profile.goals && profile.goals.length > 0) completeness += 15;
+    if (profile.lookingFor && profile.lookingFor.length > 0) completeness += 10;
+  }
+
+  const [
+    topMatches,
+    pendingCount,
+    acceptedCount,
+    notifData,
+    convoCount,
+    recommendationsCount,
+    activeUsersCount,
+    allProfiles,
+  ] = await Promise.all([
     getRecommendations(user!.id, 3),
     db.connection.count({ where: { receiverId: user!.id, status: "PENDING" } }),
     db.connection.count({
@@ -32,7 +53,36 @@ export default async function DashboardPage() {
       },
     }),
     getUserNotifications(10),
+    db.conversationParticipant.count({ where: { userId: user!.id } }),
+    db.matchRecommendation.count({ where: { userId: user!.id } }),
+    db.user.count(),
+    db.profile.findMany({ select: { skills: true, interests: true } }),
   ]);
+
+  // Dynamic skill/interest aggregations for platform analytics
+  const skillCounts: Record<string, number> = {};
+  const interestCounts: Record<string, number> = {};
+
+  allProfiles.forEach((p) => {
+    p.skills.forEach((s) => {
+      const clean = s.trim();
+      if (clean) skillCounts[clean] = (skillCounts[clean] || 0) + 1;
+    });
+    p.interests.forEach((i) => {
+      const clean = i.trim();
+      if (clean) interestCounts[clean] = (interestCounts[clean] || 0) + 1;
+    });
+  });
+
+  const commonSkills = Object.entries(skillCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map((entry) => entry[0]);
+
+  const commonInterests = Object.entries(interestCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map((entry) => entry[0]);
 
   return (
     <DashboardClient
@@ -50,6 +100,20 @@ export default async function DashboardPage() {
       pendingConnectionCount={pendingCount}
       acceptedConnectionCount={acceptedCount}
       recentNotifications={[...notifData.unread, ...notifData.read]}
+      analytics={{
+        user: {
+          completeness,
+          totalConnections: acceptedCount,
+          pendingRequests: pendingCount,
+          conversations: convoCount,
+          aiMatchCount: recommendationsCount,
+        },
+        platform: {
+          activeUsers: activeUsersCount,
+          commonSkills,
+          commonInterests,
+        },
+      }}
     />
   );
 }

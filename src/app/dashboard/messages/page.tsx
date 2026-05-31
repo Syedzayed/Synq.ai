@@ -33,7 +33,7 @@ export default function MessagesIndexPage() {
         >
           Your next collaboration
           <br />
-          starts with a conversation.
+          begins with a message.
         </h2>
         <p className="text-[13.5px] mt-2 max-w-xs mx-auto leading-relaxed" style={{ color: "#9e9890" }}>
           Select a conversation on the left, or message one of your connections.

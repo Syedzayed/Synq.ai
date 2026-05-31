@@ -4,6 +4,7 @@ import { db } from "@/lib/db/prisma";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 import { NotificationBadge } from "@/components/notifications/notification-badge";
 import { getTotalUnreadMessageCount } from "@/actions/messages";
+import { checkIsAdmin } from "@/actions/admin";
 
 export default async function DashboardLayout({
   children,
@@ -23,11 +24,12 @@ export default async function DashboardLayout({
   const displayName =
     profile?.name ?? user.user_metadata?.full_name ?? user.email ?? "User";
 
-  // Parallel fetch of badge counts
-  const [pendingCount, unreadNotifCount, unreadMsgCount] = await Promise.all([
+  // Parallel fetch of badge counts and admin check
+  const [pendingCount, unreadNotifCount, unreadMsgCount, isAdmin] = await Promise.all([
     db.connection.count({ where: { receiverId: user.id, status: "PENDING" } }),
     db.notification.count({ where: { userId: user.id, isRead: false } }),
     getTotalUnreadMessageCount(),
+    checkIsAdmin(),
   ]);
 
   return (
@@ -37,6 +39,7 @@ export default async function DashboardLayout({
         pendingConnectionCount={pendingCount}
         unreadNotificationCount={unreadNotifCount}
         unreadMessageCount={unreadMsgCount}
+        isAdmin={isAdmin}
       />
       <main className="flex-1 overflow-auto">{children}</main>
     </div>

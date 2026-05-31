@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   LayoutDashboard, MessageSquare, Compass, Sparkles,
-  LogOut, Network, UserCircle, Bell,
+  LogOut, Network, UserCircle, Bell, Search, ShieldAlert
 } from "lucide-react";
 import { signOut } from "@/lib/auth/supabase";
 
@@ -21,6 +21,7 @@ interface DashboardNavProps {
   pendingConnectionCount?: number;
   unreadNotificationCount?: number;
   unreadMessageCount?: number;
+  isAdmin?: boolean;
 }
 
 export function DashboardNav({
@@ -28,14 +29,17 @@ export function DashboardNav({
   pendingConnectionCount = 0,
   unreadNotificationCount = 0,
   unreadMessageCount = 0,
+  isAdmin = false,
 }: DashboardNavProps) {
   const pathname = usePathname();
   const initial = userName.charAt(0).toUpperCase();
 
+  // Desktop links - detailed
   const NAV_ITEMS: NavItem[] = [
     { href: "/dashboard",              label: "Dashboard",     icon: LayoutDashboard },
     { href: "/dashboard/discover",     label: "Discover",      icon: Compass },
     { href: "/dashboard/matches",      label: "Matches",       icon: Sparkles },
+    { href: "/dashboard/search",       label: "Search",        icon: Search },
     {
       href: "/dashboard/connections",
       label: "Connections",
@@ -58,6 +62,34 @@ export function DashboardNav({
     { href: "/dashboard/profile",      label: "Profile",       icon: UserCircle },
   ];
 
+  if (isAdmin) {
+    NAV_ITEMS.push({
+      href: "/admin",
+      label: "Admin Panel",
+      icon: ShieldAlert,
+    });
+  }
+
+  // Mobile links - compact
+  const MOBILE_NAV_ITEMS: NavItem[] = [
+    { href: "/dashboard",              label: "Home",          icon: LayoutDashboard },
+    { href: "/dashboard/discover",     label: "Discover",      icon: Compass },
+    { href: "/dashboard/search",       label: "Search",        icon: Search },
+    {
+      href: "/dashboard/connections",
+      label: "Network",
+      icon: Network,
+      badge: pendingConnectionCount > 0 ? pendingConnectionCount : undefined,
+    },
+    {
+      href: "/dashboard/messages",
+      label: "Chat",
+      icon: MessageSquare,
+      badge: unreadMessageCount > 0 ? unreadMessageCount : undefined,
+    },
+    { href: "/dashboard/profile",      label: "Profile",       icon: UserCircle },
+  ];
+
   const handleSignOut = async () => {
     await signOut();
     window.location.href = "/login";
@@ -67,7 +99,7 @@ export function DashboardNav({
     <>
       {/* Desktop sidebar */}
       <aside
-        className="hidden md:flex flex-col w-56 flex-shrink-0 py-5 px-3"
+        className="hidden md:flex flex-col w-56 flex-shrink-0 py-5 px-3 bg-[#FDFBF7]"
         style={{ borderRight: "1px solid rgba(232,226,216,0.9)" }}
       >
         {/* Logo + bell */}
@@ -103,7 +135,7 @@ export function DashboardNav({
         </div>
 
         {/* Nav links */}
-        <nav className="flex flex-col gap-1 flex-1">
+        <nav className="flex flex-col gap-1 flex-1 overflow-y-auto">
           {NAV_ITEMS.map(({ href, label, icon: Icon, badge }) => {
             const active =
               href === "/dashboard"
@@ -113,7 +145,7 @@ export function DashboardNav({
               <Link
                 key={href}
                 href={href}
-                className="relative flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-colors"
+                className="relative flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium transition-colors"
                 style={{ color: active ? "#e07a5f" : "#6b6560" }}
               >
                 {active && (
@@ -173,14 +205,14 @@ export function DashboardNav({
 
       {/* Mobile bottom nav */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around px-1 py-2"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around px-1 py-1.5"
         style={{
           background: "rgba(253,251,247,0.95)",
           borderTop: "1px solid rgba(232,226,216,0.9)",
           backdropFilter: "blur(12px)",
         }}
       >
-        {NAV_ITEMS.map(({ href, label, icon: Icon, badge }) => {
+        {MOBILE_NAV_ITEMS.map(({ href, label, icon: Icon, badge }) => {
           const active =
             href === "/dashboard"
               ? pathname === "/dashboard"
@@ -189,7 +221,7 @@ export function DashboardNav({
             <Link
               key={href}
               href={href}
-              className="relative flex flex-col items-center gap-1 py-1 px-2"
+              className="relative flex flex-col items-center gap-0.5 py-1 px-2"
               style={{ color: active ? "#e07a5f" : "#9e9890" }}
             >
               <div className="relative">
