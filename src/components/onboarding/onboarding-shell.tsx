@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { WelcomeBanner } from "./welcome-banner";
 import { OnboardingProgress } from "./onboarding-progress";
 import { StepIdentity } from "./step-identity";
+import { StepGender } from "./step-gender";
 import { StepSkills } from "./step-skills";
 import { StepInterests } from "./step-interests";
 import { StepProjects } from "./step-projects";
@@ -16,8 +17,8 @@ import { completeOnboarding, type OnboardingData } from "@/actions/onboarding";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-// Steps: 0=welcome, 1–7=form steps, 8=generating
-const FORM_STEPS = 7;
+// Steps: 0=welcome, 1–8=form steps, 9=generating
+const FORM_STEPS = 8;
 
 interface OnboardingShellProps {
   initialName?: string | null;
@@ -33,6 +34,7 @@ const DEFAULT_DATA: OnboardingData = {
   projects: "",
   goals: [],
   lookingFor: [],
+  gender: "",
 };
 
 export function OnboardingShell({ initialName, isNewUser = true }: OnboardingShellProps) {
@@ -64,7 +66,7 @@ export function OnboardingShell({ initialName, isNewUser = true }: OnboardingShe
   const handleSubmit = async () => {
     setError(null);
     setDirection(1);
-    setStep(8); // generating screen
+    setStep(9); // generating screen
     setGeneratingStage(0);
 
     // Simulate stage progress while the server action runs
@@ -78,7 +80,7 @@ export function OnboardingShell({ initialName, isNewUser = true }: OnboardingShe
 
       if (!result.success) {
         setError(result.error ?? "Something went wrong. Please try again.");
-        setStep(7); // back to review
+        setStep(8); // back to review (which is step 8 now)
         return;
       }
 
@@ -91,7 +93,7 @@ export function OnboardingShell({ initialName, isNewUser = true }: OnboardingShe
       clearInterval(stageTimer);
       console.error("[OnboardingShell] submit error:", err);
       setError("An unexpected error occurred. Please try again.");
-      setStep(7);
+      setStep(8);
     }
   };
 
@@ -121,7 +123,7 @@ export function OnboardingShell({ initialName, isNewUser = true }: OnboardingShe
       />
 
       <div className="w-full max-w-2xl mx-auto relative">
-        {/* Progress bar (shown during form steps 1–7 only) */}
+        {/* Progress bar (shown during form steps 1–8 only) */}
         <AnimatePresence>
           {step >= 1 && step <= FORM_STEPS && (
             <motion.div
@@ -167,21 +169,24 @@ export function OnboardingShell({ initialName, isNewUser = true }: OnboardingShe
                 <StepIdentity data={data} onChange={patch} onNext={next} />
               )}
               {step === 2 && (
-                <StepSkills data={data} onChange={patch} onNext={next} onBack={back} />
+                <StepGender data={data} onChange={patch} onNext={next} onBack={back} />
               )}
               {step === 3 && (
-                <StepInterests data={data} onChange={patch} onNext={next} onBack={back} />
+                <StepSkills data={data} onChange={patch} onNext={next} onBack={back} />
               )}
               {step === 4 && (
-                <StepProjects data={data} onChange={patch} onNext={next} onBack={back} />
+                <StepInterests data={data} onChange={patch} onNext={next} onBack={back} />
               )}
               {step === 5 && (
-                <StepGoals data={data} onChange={patch} onNext={next} onBack={back} />
+                <StepProjects data={data} onChange={patch} onNext={next} onBack={back} />
               )}
               {step === 6 && (
-                <StepLookingFor data={data} onChange={patch} onNext={next} onBack={back} />
+                <StepGoals data={data} onChange={patch} onNext={next} onBack={back} />
               )}
               {step === 7 && (
+                <StepLookingFor data={data} onChange={patch} onNext={next} onBack={back} />
+              )}
+              {step === 8 && (
                 <>
                   {error && (
                     <div
@@ -199,7 +204,7 @@ export function OnboardingShell({ initialName, isNewUser = true }: OnboardingShe
                   />
                 </>
               )}
-              {step === 8 && (
+              {step === 9 && (
                 <StepGenerating currentStage={generatingStage} />
               )}
             </motion.div>

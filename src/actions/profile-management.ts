@@ -28,6 +28,7 @@ export interface ProfileUpdateInput {
   projects: string;
   goals: string[];
   lookingFor: string[];
+  gender?: string;
 }
 
 export interface ActionResult {
@@ -69,6 +70,7 @@ export async function updateProfile(input: ProfileUpdateInput): Promise<ActionRe
         projects: input.projects?.trim() || null,
         goals: sanitizeTags(input.goals),
         lookingFor: sanitizeTags(input.lookingFor),
+        gender: input.gender || null,
         updatedAt: new Date(),
       },
     });

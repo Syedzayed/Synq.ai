@@ -37,6 +37,7 @@ export interface ProfileData {
   goals: string[];
   lookingFor: string[];
   aiSummary: string | null;
+  gender?: string | null;
 }
 
 interface ProfilePageClientProps {
@@ -58,7 +59,7 @@ export function ProfilePageClient({ profile }: ProfilePageClientProps) {
     aiSummary: profile.aiSummary,
   });
 
-  const editInitial: ProfileUpdateInput = {
+  const editInitial: ProfileUpdateInput & { gender?: string } = {
     name: profile.name,
     role: profile.role ?? "",
     organization: profile.organization ?? "",
@@ -67,6 +68,7 @@ export function ProfilePageClient({ profile }: ProfilePageClientProps) {
     projects: profile.projects ?? "",
     goals: profile.goals,
     lookingFor: profile.lookingFor,
+    gender: profile.gender ?? "",
   };
 
   return (
@@ -117,6 +119,7 @@ export function ProfilePageClient({ profile }: ProfilePageClientProps) {
             name={profile.name}
             role={profile.role}
             organization={profile.organization}
+            gender={profile.gender}
             isOwnProfile
           />
         </div>

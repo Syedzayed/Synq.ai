@@ -264,7 +264,7 @@ export function DiscoverHub({
                 >
                   Search Results
                 </h2>
-                <p className="text-[13px] text-[#9e9890] mt-1">
+                <p className="text-[13px] text-[#7e756c] mt-1">
                   Found {searchResults.length} {searchResults.length === 1 ? "builder" : "builders"} matching your query
                 </p>
               </div>
@@ -341,7 +341,7 @@ export function DiscoverHub({
                         )}
                         {p.skills.length > 0 && (
                           <div className="flex flex-col gap-1">
-                            <p className="text-[10px] font-bold uppercase tracking-wider text-[#b8b2aa] flex items-center gap-1">
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-[#7e756c] flex items-center gap-1">
                               <Tag size={9} />
                               Skills
                             </p>
@@ -475,7 +475,7 @@ export function DiscoverHub({
                               <div className="flex-grow min-w-0">
                                 <p className="text-[15px] font-bold truncate text-[#1e1a17]">{name}</p>
                                 {rec.matchedProfile.role && (
-                                  <p className="text-[12.5px] text-[#9e9890] flex items-center gap-1 truncate mt-0.5">
+                                  <p className="text-[12.5px] text-[#7e756c] flex items-center gap-1 truncate mt-0.5">
                                     <Briefcase size={10} />
                                     {rec.matchedProfile.role}
                                   </p>
@@ -498,7 +498,7 @@ export function DiscoverHub({
 
                           {rec.matchedProfile.skills?.length > 0 && (
                             <div className="flex flex-col gap-1">
-                              <p className="text-[10px] font-bold uppercase tracking-wider text-[#b8b2aa]">Matched Skills</p>
+                              <p className="text-[10px] font-bold uppercase tracking-wider text-[#7e756c]">Matched Skills</p>
                               <ProfileTags items={rec.matchedProfile.skills} max={3} variant="skill" />
                             </div>
                           )}
@@ -579,7 +579,7 @@ export function DiscoverHub({
                           </div>
                           <div className="min-w-0">
                             <p className="text-[13.5px] font-bold truncate text-[#1e1a17]">{name}</p>
-                            <p className="text-[11px] text-[#9e9890] truncate">{p.role ?? "Community Member"}</p>
+                            <p className="text-[11px] text-[#7e756c] truncate">{p.role ?? "Community Member"}</p>
                           </div>
                         </div>
 
@@ -634,7 +634,7 @@ export function DiscoverHub({
 
               {initialEveryone.length === 0 ? (
                 <div className="text-center py-16 bg-[#fdfbf7] rounded-3xl border border-[#e8e2d8]">
-                  <p className="text-[14px] text-[#9e9890]">No active platform members found.</p>
+                  <p className="text-[14px] text-[#7e756c]">No active platform members found.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -669,7 +669,7 @@ export function DiscoverHub({
                               <div className="flex-grow min-w-0">
                                 <p className="text-[14.5px] font-bold truncate text-[#1e1a17]">{name}</p>
                                 {p.role && (
-                                  <p className="text-[11.5px] text-[#9e9890] flex items-center gap-1 truncate mt-0.5">
+                                  <p className="text-[12.5px] text-[#7e756c] flex items-center gap-1 truncate mt-0.5">
                                     <Briefcase size={10} />
                                     {p.role}
                                   </p>

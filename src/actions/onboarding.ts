@@ -28,6 +28,7 @@ export interface OnboardingData {
   projects: string;
   goals: string[];
   lookingFor: string[];
+  gender?: string;
 }
 
 export interface OnboardingResult {
@@ -87,6 +88,7 @@ export async function completeOnboarding(
       projects: data.projects.trim() || null,
       goals: data.goals,
       lookingFor: data.lookingFor,
+      gender: data.gender || null,
       embedding: [],
     },
     update: {
@@ -98,6 +100,7 @@ export async function completeOnboarding(
       projects: data.projects.trim() || null,
       goals: data.goals,
       lookingFor: data.lookingFor,
+      gender: data.gender || null,
     },
   });
 

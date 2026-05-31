@@ -137,12 +137,12 @@ export function NotificationCard({ notification, index = 0 }: NotificationCardPr
                 style={{ background: cfg.color }}
               />
             )}
-            <span className="text-[11px]" style={{ color: "#b8b2aa" }}>
+            <span className="text-[11px]" style={{ color: "#7e756c" }}>
               {timeAgo(notification.createdAt)}
             </span>
           </div>
         </div>
-        <p className="text-[12.5px] mt-0.5 leading-relaxed" style={{ color: "#9e9890" }}>
+        <p className="text-[12.5px] mt-0.5 leading-relaxed" style={{ color: "#5a544e" }}>
           {notification.message}
         </p>
       </div>

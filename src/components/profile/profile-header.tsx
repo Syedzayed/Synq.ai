@@ -7,6 +7,7 @@ interface ProfileHeaderProps {
   name: string;
   role: string | null;
   organization: string | null;
+  gender?: string | null;
   isOwnProfile?: boolean;
 }
 
@@ -21,7 +22,7 @@ function avatarGradient(name: string) {
   return gradients[(name?.charCodeAt(0) ?? 65) % gradients.length];
 }
 
-export function ProfileHeader({ name, role, organization, isOwnProfile = false }: ProfileHeaderProps) {
+export function ProfileHeader({ name, role, organization, gender, isOwnProfile = false }: ProfileHeaderProps) {
   const initial = name.charAt(0).toUpperCase();
 
   return (
@@ -73,8 +74,8 @@ export function ProfileHeader({ name, role, organization, isOwnProfile = false }
           >
             {name}
           </h1>
-          {(role || organization) && (
-            <div className="flex flex-wrap items-center gap-3 mt-2">
+          {(role || organization || (gender && gender !== "Prefer Not To Say")) && (
+            <div className="flex flex-wrap items-center gap-3.5 mt-2">
               {role && (
                 <span className="flex items-center gap-1.5 text-[14px]" style={{ color: "#6b6560" }}>
                   <Briefcase size={13} style={{ color: "#e07a5f" }} />
@@ -85,6 +86,11 @@ export function ProfileHeader({ name, role, organization, isOwnProfile = false }
                 <span className="flex items-center gap-1.5 text-[14px]" style={{ color: "#6b6560" }}>
                   <Building2 size={13} style={{ color: "#e07a5f" }} />
                   {organization}
+                </span>
+              )}
+              {gender && gender !== "Prefer Not To Say" && (
+                <span className="inline-flex items-center gap-1 text-[12.5px] px-2.5 py-0.5 rounded-lg font-medium" style={{ background: "rgba(224,122,95,0.08)", color: "#e07a5f", border: "1px solid rgba(224,122,95,0.18)" }}>
+                  {gender}
                 </span>
               )}
             </div>

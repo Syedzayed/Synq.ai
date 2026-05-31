@@ -44,6 +44,7 @@ export default async function ProfilePage({ params }: Props) {
       projects: true,
       goals: true,
       lookingFor: true,
+      gender: true,
     },
   });
 
@@ -79,6 +80,7 @@ export default async function ProfilePage({ params }: Props) {
           projects: profile.projects,
           goals: profile.goals,
           lookingFor: profile.lookingFor,
+          gender: profile.gender,
         }}
         connectionStatus={connectionData?.status ?? null}
         connectionId={connectionData?.connectionId ?? null}

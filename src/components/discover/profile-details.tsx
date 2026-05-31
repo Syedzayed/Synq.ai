@@ -73,6 +73,7 @@ export interface FullProfile {
   projects: string | null;
   goals: string[];
   lookingFor: string[];
+  gender?: string | null;
 }
 
 interface ProfileDetailsProps {
@@ -144,17 +145,26 @@ export function ProfileDetails({ profile, connectionStatus = null, connectionId 
             >
               {profile.name}
             </h1>
-            {profile.role && (
-              <p className="mt-1 flex items-center gap-1.5 text-[14px]" style={{ color: "#6b6560" }}>
-                <Briefcase size={13} style={{ color: "#e07a5f" }} />
-                {profile.role}
-                {profile.organization && (
-                  <>
-                    <span style={{ color: "#c8c2ba" }}>·</span>
-                    {profile.organization}
-                  </>
+            {(profile.role || (profile.gender && profile.gender !== "Prefer Not To Say")) && (
+              <div className="mt-1 flex flex-wrap items-center gap-3">
+                {profile.role && (
+                  <span className="flex items-center gap-1.5 text-[14px]" style={{ color: "#6b6560" }}>
+                    <Briefcase size={13} style={{ color: "#e07a5f" }} />
+                    {profile.role}
+                    {profile.organization && (
+                      <>
+                        <span style={{ color: "#c8c2ba" }}>·</span>
+                        {profile.organization}
+                      </>
+                    )}
+                  </span>
                 )}
-              </p>
+                {profile.gender && profile.gender !== "Prefer Not To Say" && (
+                  <span className="inline-flex items-center gap-1 text-[12.5px] px-2.5 py-0.5 rounded-lg font-medium" style={{ background: "rgba(224,122,95,0.08)", color: "#e07a5f", border: "1px solid rgba(224,122,95,0.18)" }}>
+                    {profile.gender}
+                  </span>
+                )}
+              </div>
             )}
           </div>
 

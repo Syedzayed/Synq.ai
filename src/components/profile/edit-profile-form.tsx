@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 interface EditProfileFormProps {
   isOpen: boolean;
   onClose: () => void;
-  initialData: ProfileUpdateInput;
+  initialData: ProfileUpdateInput & { gender?: string };
 }
 
 // ─── Tag input ─────────────────────────────────────────────────────────────────
@@ -158,7 +158,7 @@ function Field({
 // ─── Main form ─────────────────────────────────────────────────────────────────
 
 export function EditProfileForm({ isOpen, onClose, initialData }: EditProfileFormProps) {
-  const [form, setForm] = useState<ProfileUpdateInput>(initialData);
+  const [form, setForm] = useState<ProfileUpdateInput & { gender?: string }>(initialData);
   const [isPending, startTransition] = useTransition();
   const [step, setStep] = useState<"idle" | "saving" | "embedding" | "refreshing" | "done">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -175,8 +175,10 @@ export function EditProfileForm({ isOpen, onClose, initialData }: EditProfileFor
     if (e.target === overlayRef.current) onClose();
   };
 
-  const set = <K extends keyof ProfileUpdateInput>(key: K, val: ProfileUpdateInput[K]) =>
-    setForm((prev) => ({ ...prev, [key]: val }));
+  const set = <K extends keyof (ProfileUpdateInput & { gender?: string })>(
+    key: K,
+    val: (ProfileUpdateInput & { gender?: string })[K]
+  ) => setForm((prev) => ({ ...prev, [key]: val }));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -265,6 +267,28 @@ export function EditProfileForm({ isOpen, onClose, initialData }: EditProfileFor
                   <Field label="Name *" value={form.name} onChange={(v) => set("name", v)} placeholder="Your name" />
                   <Field label="Role *" value={form.role} onChange={(v) => set("role", v)} placeholder="e.g. Product Designer" />
                   <Field label="Organization" value={form.organization} onChange={(v) => set("organization", v)} placeholder="e.g. Startup Inc." />
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[12px] font-semibold uppercase tracking-[0.1em]" style={{ color: "#9e9890" }}>
+                      Gender Identity
+                    </label>
+                    <select
+                      value={form.gender || ""}
+                      onChange={(e) => set("gender", e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl text-[13px] outline-none transition-all"
+                      style={{
+                        background: "#f8f4ef",
+                        border: "1px solid rgba(232,226,216,0.9)",
+                        color: "#1e1a17",
+                        height: "41px",
+                      }}
+                    >
+                      <option value="">Select Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Non-Binary">Non-Binary</option>
+                      <option value="Prefer Not To Say">Prefer Not To Say</option>
+                    </select>
+                  </div>
                 </div>
 
                 {/* Skills / Interests */}

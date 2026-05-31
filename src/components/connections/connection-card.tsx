@@ -57,14 +57,14 @@ export function ConnectionCard({ connection, currentUserId, index = 0 }: Connect
           {name}
         </p>
         {otherUser.role && (
-          <p className="text-[12px] flex items-center gap-1 mt-0.5 truncate" style={{ color: "#9e9890" }}>
+          <p className="text-[12px] flex items-center gap-1 mt-0.5 truncate" style={{ color: "#7e756c" }}>
             <Briefcase size={10} />
             {otherUser.role}
             {otherUser.organization && ` · ${otherUser.organization}`}
           </p>
         )}
         {otherUser.aiSummary && (
-          <p className="text-[12px] mt-1 line-clamp-1" style={{ color: "#6b6560" }}>
+          <p className="text-[12px] mt-1 line-clamp-1" style={{ color: "#5a544e" }}>
             {otherUser.aiSummary}
           </p>
         )}
@@ -87,7 +87,7 @@ export function ConnectionCard({ connection, currentUserId, index = 0 }: Connect
           className="p-2 rounded-xl transition-colors hover:bg-[rgba(232,226,216,0.5)]"
           title="View Profile"
         >
-          <ArrowRight size={14} style={{ color: "#9e9890" }} />
+          <ArrowRight size={14} style={{ color: "#7e756c" }} />
         </Link>
       </div>
     </motion.div>

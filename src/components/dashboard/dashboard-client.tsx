@@ -55,7 +55,7 @@ function StatCard({ icon: Icon, label, count }: { icon: React.ElementType; label
       </div>
       <div>
         <p className="text-[20px] font-bold" style={{ color: "#1e1a17" }}>{count}</p>
-        <p className="text-[12px]" style={{ color: "#9e9890" }}>{label}</p>
+        <p className="text-[12px]" style={{ color: "#7e756c" }}>{label}</p>
       </div>
     </motion.div>
   );
@@ -133,7 +133,7 @@ export function DashboardClient({
                 </div>
                 <div>
                   <p className="text-[15px] font-semibold" style={{ color: "#1e1a17" }}>{profile.name}</p>
-                  <p className="text-[12.5px]" style={{ color: "#9e9890" }}>
+                  <p className="text-[12.5px]" style={{ color: "#7e756c" }}>
                     {profile.role}{profile.organization ? ` · ${profile.organization}` : ""}
                   </p>
                 </div>
@@ -164,16 +164,16 @@ export function DashboardClient({
               className="rounded-2xl p-5 space-y-4"
               style={{ background: "rgba(255,252,248,0.98)", border: "1px solid rgba(232,226,216,0.9)", boxShadow: "0 2px 12px rgba(58,53,48,0.05)" }}
             >
-              <p className="text-[12px] font-bold uppercase tracking-[0.1em] text-neutral-400">Platform Analytics</p>
+              <p className="text-[12px] font-bold uppercase tracking-[0.1em]" style={{ color: "#7e756c" }}>Platform Analytics</p>
               
               <div className="space-y-3">
                 <div className="flex justify-between items-center text-[13.5px]">
-                  <span className="text-neutral-500 font-medium">Active Users</span>
-                  <span className="font-bold text-neutral-800">{analytics.platform.activeUsers}</span>
+                  <span className="font-semibold" style={{ color: "#5a544e" }}>Active Users</span>
+                  <span className="font-bold" style={{ color: "#1e1a17" }}>{analytics.platform.activeUsers}</span>
                 </div>
                 
                 <div className="space-y-1.5">
-                  <span className="text-[12px] font-semibold text-neutral-400 block uppercase">Trending Skills</span>
+                  <span className="text-[12px] font-semibold block uppercase" style={{ color: "#7e756c" }}>Trending Skills</span>
                   <div className="flex flex-wrap gap-1">
                     {analytics.platform.commonSkills.map(s => (
                       <span key={s} className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-[#FDFBF7] text-[#e07a5f] border border-[#e8e2d8]">{s}</span>
@@ -182,7 +182,7 @@ export function DashboardClient({
                 </div>
 
                 <div className="space-y-1.5">
-                  <span className="text-[12px] font-semibold text-neutral-400 block uppercase">Trending Interests</span>
+                  <span className="text-[12px] font-semibold block uppercase" style={{ color: "#7e756c" }}>Trending Interests</span>
                   <div className="flex flex-wrap gap-1">
                     {analytics.platform.commonInterests.map(i => (
                       <span key={i} className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-[#FDFBF7] text-[#f4a261] border border-[#e8e2d8]">{i}</span>
@@ -205,7 +205,7 @@ export function DashboardClient({
               style={{ background: "rgba(255,252,248,0.98)", border: "1px solid rgba(232,226,216,0.9)", boxShadow: "0 2px 12px rgba(58,53,48,0.05)" }}
             >
               <div className="flex justify-between items-center">
-                <p className="text-[12px] font-bold uppercase tracking-[0.1em] text-neutral-400">Profile Completeness</p>
+                <p className="text-[12px] font-bold uppercase tracking-[0.1em]" style={{ color: "#7e756c" }}>Profile Completeness</p>
                 <span className="text-[13px] font-bold text-[#e07a5f]">{analytics.user.completeness}%</span>
               </div>
               {/* Progress bar */}
@@ -222,16 +222,16 @@ export function DashboardClient({
               {/* Stats overview */}
               <div className="grid grid-cols-3 gap-2 pt-2 text-center">
                 <div className="p-3 bg-[#FDFBF7] rounded-xl border border-neutral-100">
-                  <p className="text-[18px] font-bold text-neutral-800">{analytics.user.conversations}</p>
-                  <p className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">Conversations</p>
+                  <p className="text-[18px] font-bold" style={{ color: "#1e1a17" }}>{analytics.user.conversations}</p>
+                  <p className="text-[10px] uppercase font-bold tracking-wider" style={{ color: "#7e756c" }}>Conversations</p>
                 </div>
                 <div className="p-3 bg-[#FDFBF7] rounded-xl border border-neutral-100">
-                  <p className="text-[18px] font-bold text-neutral-800">{analytics.user.aiMatchCount}</p>
-                  <p className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">AI Matches</p>
+                  <p className="text-[18px] font-bold" style={{ color: "#1e1a17" }}>{analytics.user.aiMatchCount}</p>
+                  <p className="text-[10px] uppercase font-bold tracking-wider" style={{ color: "#7e756c" }}>AI Matches</p>
                 </div>
                 <div className="p-3 bg-[#FDFBF7] rounded-xl border border-neutral-100">
-                  <p className="text-[18px] font-bold text-neutral-800">{analytics.user.totalConnections}</p>
-                  <p className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">Connections</p>
+                  <p className="text-[18px] font-bold" style={{ color: "#1e1a17" }}>{analytics.user.totalConnections}</p>
+                  <p className="text-[10px] uppercase font-bold tracking-wider" style={{ color: "#7e756c" }}>Connections</p>
                 </div>
               </div>
             </motion.div>
@@ -263,7 +263,7 @@ export function DashboardClient({
               className="rounded-2xl p-5"
               style={{ background: "rgba(255,252,248,0.98)", border: "1px solid rgba(232,226,216,0.9)", boxShadow: "0 2px 12px rgba(58,53,48,0.05)" }}
             >
-              <p className="text-[12px] font-semibold uppercase tracking-[0.1em] mb-3" style={{ color: "#9e9890" }}>Your Skills</p>
+              <p className="text-[12px] font-semibold uppercase tracking-[0.1em] mb-3" style={{ color: "#7e756c" }}>Your Skills</p>
               <div className="flex flex-wrap gap-2">
                 {profile.skills.map((s) => <TagBadge key={s} text={s} />)}
               </div>

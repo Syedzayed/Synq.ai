@@ -24,6 +24,7 @@ export default async function ProfilePage() {
       goals: true,
       lookingFor: true,
       aiSummary: true,
+      gender: true,
     },
   });
 
@@ -41,6 +42,7 @@ export default async function ProfilePage() {
         goals: profile.goals,
         lookingFor: profile.lookingFor,
         aiSummary: profile.aiSummary,
+        gender: profile.gender,
       }}
     />
   );
