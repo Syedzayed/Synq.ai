@@ -34,7 +34,7 @@ const TYPE_CONFIG: Record<
     color: "#c47f30",
     bg: "rgba(244,162,97,0.08)",
     border: "rgba(244,162,97,0.18)",
-    actionPath: (n) => n.relatedUserId ? `/dashboard/discover/${n.relatedUserId}` : "/dashboard/matches",
+    actionPath: (n) => n.relatedUserId ? `/dashboard/discover/${n.relatedUserId}` : "/dashboard/discover",
   },
   PROFILE_VIEW: {
     icon: Eye,
@@ -48,7 +48,7 @@ const TYPE_CONFIG: Record<
     color: "#e07a5f",
     bg: "rgba(224,122,95,0.08)",
     border: "rgba(224,122,95,0.18)",
-    actionPath: () => "/dashboard/matches",
+    actionPath: () => "/dashboard/discover",
   },
   SYSTEM: {
     icon: Bell,

@@ -6,6 +6,9 @@ import { NotificationBadge } from "@/components/notifications/notification-badge
 import { getTotalUnreadMessageCount } from "@/actions/messages";
 import { checkIsAdmin } from "@/actions/admin";
 
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { getUserNotifications } from "@/actions/notifications";
+
 export default async function DashboardLayout({
   children,
 }: {
@@ -24,12 +27,13 @@ export default async function DashboardLayout({
   const displayName =
     profile?.name ?? user.user_metadata?.full_name ?? user.email ?? "User";
 
-  // Parallel fetch of badge counts and admin check
-  const [pendingCount, unreadNotifCount, unreadMsgCount, isAdmin] = await Promise.all([
+  // Parallel fetch of badge counts, admin check, and dropdown notifications
+  const [pendingCount, unreadNotifCount, unreadMsgCount, isAdmin, notificationsData] = await Promise.all([
     db.connection.count({ where: { receiverId: user.id, status: "PENDING" } }),
     db.notification.count({ where: { userId: user.id, isRead: false } }),
     getTotalUnreadMessageCount(),
     checkIsAdmin(),
+    getUserNotifications(5),
   ]);
 
   return (
@@ -41,7 +45,16 @@ export default async function DashboardLayout({
         unreadMessageCount={unreadMsgCount}
         isAdmin={isAdmin}
       />
-      <main className="flex-1 overflow-auto">{children}</main>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <DashboardHeader
+          userName={displayName}
+          unreadNotificationCount={unreadNotifCount}
+          initialNotifications={notificationsData.unread.concat(notificationsData.read).slice(0, 5)}
+        />
+        <main className="flex-grow overflow-y-auto bg-[#fdfbf7] pb-16 md:pb-0">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

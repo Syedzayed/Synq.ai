@@ -38,19 +38,11 @@ export function DashboardNav({
   const NAV_ITEMS: NavItem[] = [
     { href: "/dashboard",              label: "Dashboard",     icon: LayoutDashboard },
     { href: "/dashboard/discover",     label: "Discover",      icon: Compass },
-    { href: "/dashboard/matches",      label: "Matches",       icon: Sparkles },
-    { href: "/dashboard/search",       label: "Search",        icon: Search },
     {
       href: "/dashboard/connections",
       label: "Connections",
       icon: Network,
       badge: pendingConnectionCount > 0 ? pendingConnectionCount : undefined,
-    },
-    {
-      href: "/dashboard/notifications",
-      label: "Notifications",
-      icon: Bell,
-      badge: unreadNotificationCount > 0 ? unreadNotificationCount : undefined,
     },
     {
       href: "/dashboard/messages",
@@ -74,7 +66,6 @@ export function DashboardNav({
   const MOBILE_NAV_ITEMS: NavItem[] = [
     { href: "/dashboard",              label: "Home",          icon: LayoutDashboard },
     { href: "/dashboard/discover",     label: "Discover",      icon: Compass },
-    { href: "/dashboard/search",       label: "Search",        icon: Search },
     {
       href: "/dashboard/connections",
       label: "Network",
@@ -102,7 +93,7 @@ export function DashboardNav({
         className="hidden md:flex flex-col w-56 flex-shrink-0 py-5 px-3 bg-[#FDFBF7]"
         style={{ borderRight: "1px solid rgba(232,226,216,0.9)" }}
       >
-        {/* Logo + bell */}
+        {/* Logo */}
         <div className="flex items-center justify-between px-2 mb-8">
           <Link href="/dashboard" className="flex items-center gap-2">
             <div
@@ -114,23 +105,6 @@ export function DashboardNav({
             <span className="text-[15px] font-bold" style={{ color: "#1e1a17" }}>
               Synq
             </span>
-          </Link>
-
-          {/* Bell button */}
-          <Link
-            href="/dashboard/notifications"
-            className="relative flex items-center justify-center h-7 w-7 rounded-xl transition-colors hover:bg-[rgba(224,122,95,0.08)]"
-            title="Notifications"
-          >
-            <Bell size={15} style={{ color: unreadNotificationCount > 0 ? "#e07a5f" : "#9e9890" }} />
-            {unreadNotificationCount > 0 && (
-              <span
-                className="absolute -top-0.5 -right-0.5 min-w-[14px] h-3.5 px-0.5 rounded-full text-[8px] font-bold flex items-center justify-center"
-                style={{ background: "#e07a5f", color: "white" }}
-              >
-                {unreadNotificationCount > 9 ? "9+" : unreadNotificationCount}
-              </span>
-            )}
           </Link>
         </div>
 
