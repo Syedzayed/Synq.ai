@@ -130,7 +130,7 @@ export async function getConversations(): Promise<ConversationPreview[]> {
 
   if (myParticipations.length === 0) return []; // ← short-circuit, prevents IN (NULL)
 
-  const convIds = myParticipations.map((p) => p.conversationId);
+  const convIds = myParticipations.map((p: { conversationId: string }) => p.conversationId);
 
   // Step 2: fetch conversations with all other participants' profiles — flat, no deep nesting
   const [conversations, allParticipants, lastMessages, unreadCounts] = await Promise.all([
@@ -326,7 +326,7 @@ export async function getTotalUnreadMessageCount(): Promise<number> {
 
   if (participations.length === 0) return 0;
 
-  const convIds = participations.map((p) => p.conversationId);
+  const convIds = participations.map((p: { conversationId: string }) => p.conversationId);
   return db.directMessage.count({
     where: {
       conversationId: { in: convIds },

@@ -5,7 +5,7 @@ import { motion, useInView } from "framer-motion";
 import { Brain, Search, MessageSquare, Lightbulb, Users, Zap } from "lucide-react";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-const SPRING = { type: "spring", stiffness: 300, damping: 28 };
+const SPRING = { type: "spring" as const, stiffness: 300, damping: 28 };
 
 const features = [
   {

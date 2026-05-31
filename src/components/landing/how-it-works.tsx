@@ -5,7 +5,7 @@ import { motion, useInView } from "framer-motion";
 import { UserCircle2, BrainCircuit, Handshake } from "lucide-react";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-const SPRING = { type: "spring", stiffness: 280, damping: 28 };
+const SPRING = { type: "spring" as const, stiffness: 280, damping: 28 };
 
 const steps = [
   {

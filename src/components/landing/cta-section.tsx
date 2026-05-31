@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-const SPRING = { type: "spring", stiffness: 280, damping: 26 };
+const SPRING = { type: "spring" as const, stiffness: 280, damping: 26 };
 
 export function CtaSection() {
   const ref = useRef<HTMLDivElement>(null);

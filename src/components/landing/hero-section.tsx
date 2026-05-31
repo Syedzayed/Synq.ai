@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 
-const SPRING = { type: "spring", stiffness: 280, damping: 28 };
+const SPRING = { type: "spring" as const, stiffness: 280, damping: 28 };
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 const fadeUp = (delay = 0) => ({
