@@ -1,8 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { supabase } from "@/lib/auth/supabase";
 
 const SPRING = { type: "spring" as const, stiffness: 280, damping: 28 };
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -22,6 +24,20 @@ const AVATARS = [
 ];
 
 export function HeroSection() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   return (
     <section
       className="relative flex min-h-screen flex-col items-center justify-center px-6 pt-24 pb-24 text-center overflow-hidden"
@@ -98,35 +114,71 @@ export function HeroSection() {
         {...fadeUp(0.44)}
         className="mt-10 flex flex-col sm:flex-row items-center gap-3"
       >
-        <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} transition={SPRING}>
-          <Link
-            href="/register"
-            id="hero-cta-primary"
-            className="inline-flex h-12 items-center gap-2 rounded-full px-8 text-[14px] font-semibold text-white"
-            style={{
-              background: "linear-gradient(135deg, #e07a5f, #f4a261)",
-              boxShadow: "0 4px 20px rgba(224,122,95,0.30), 0 1px 4px rgba(224,122,95,0.15)",
-            }}
-          >
-            Get started free
-            <ArrowRight size={15} />
-          </Link>
-        </motion.div>
-
-        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} transition={SPRING}>
-          <a
-            href="#features"
-            id="hero-cta-secondary"
-            className="inline-flex h-12 items-center gap-2 rounded-full border px-8 text-[14px] font-semibold transition-all duration-200"
-            style={{
-              borderColor: "rgba(58,53,48,0.14)",
-              color: "#6b6560",
-              background: "rgba(253,251,247,0.7)",
-            }}
-          >
-            Explore Network
-          </a>
-        </motion.div>
+        {isAuthenticated === null ? (
+          <div className="w-40 h-12" />
+        ) : isAuthenticated ? (
+          <>
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} transition={SPRING}>
+              <Link
+                href="/dashboard"
+                id="hero-cta-primary"
+                className="inline-flex h-12 items-center gap-2 rounded-full px-8 text-[14px] font-semibold text-white"
+                style={{
+                  background: "linear-gradient(135deg, #e07a5f, #f4a261)",
+                  boxShadow: "0 4px 20px rgba(224,122,95,0.30), 0 1px 4px rgba(224,122,95,0.15)",
+                }}
+              >
+                Go to Dashboard
+                <ArrowRight size={15} />
+              </Link>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} transition={SPRING}>
+              <Link
+                href="/dashboard/discover"
+                id="hero-cta-secondary"
+                className="inline-flex h-12 items-center gap-2 rounded-full border px-8 text-[14px] font-semibold transition-all duration-200"
+                style={{
+                  borderColor: "rgba(58,53,48,0.14)",
+                  color: "#6b6560",
+                  background: "rgba(253,251,247,0.7)",
+                }}
+              >
+                Discover People
+              </Link>
+            </motion.div>
+          </>
+        ) : (
+          <>
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} transition={SPRING}>
+              <Link
+                href="/register"
+                id="hero-cta-primary"
+                className="inline-flex h-12 items-center gap-2 rounded-full px-8 text-[14px] font-semibold text-white"
+                style={{
+                  background: "linear-gradient(135deg, #e07a5f, #f4a261)",
+                  boxShadow: "0 4px 20px rgba(224,122,95,0.30), 0 1px 4px rgba(224,122,95,0.15)",
+                }}
+              >
+                Get started free
+                <ArrowRight size={15} />
+              </Link>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} transition={SPRING}>
+              <a
+                href="#features"
+                id="hero-cta-secondary"
+                className="inline-flex h-12 items-center gap-2 rounded-full border px-8 text-[14px] font-semibold transition-all duration-200"
+                style={{
+                  borderColor: "rgba(58,53,48,0.14)",
+                  color: "#6b6560",
+                  background: "rgba(253,251,247,0.7)",
+                }}
+              >
+                Explore Network
+              </a>
+            </motion.div>
+          </>
+        )}
       </motion.div>
 
       {/* Social proof avatars */}

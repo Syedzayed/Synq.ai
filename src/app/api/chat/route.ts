@@ -12,6 +12,23 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
 
+  // ── Rate Limit Checks (IP-based and User-based) ──────────────────────────
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const { checkRateLimit } = await import("@/lib/security/rate-limit");
+
+  const rlUser = checkRateLimit("ai_chat", user.id);
+  const rlIp = checkRateLimit("ai_chat", ip);
+
+  if (!rlUser.allowed || !rlIp.allowed) {
+    const remainingUser = rlUser.remainingMs ?? 0;
+    const remainingIp = rlIp.remainingMs ?? 0;
+    const waitSec = Math.ceil(Math.max(remainingUser, remainingIp) / 1000);
+    return new Response(
+      JSON.stringify({ error: `Too many chat requests. Please wait ${waitSec}s.` }),
+      { status: 429, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
   const { content, conversationId } = await req.json() as {
     content: string;
     conversationId?: string | null;

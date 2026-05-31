@@ -11,6 +11,7 @@ import { ensureUserProfile } from "@/lib/auth/db-verify";
 import { sendWelcomeEmail } from "@/lib/email/welcome";
 import { checkRateLimit, normalizeEmail } from "@/lib/security/rate-limit";
 import { headers } from "next/headers";
+import { devLog, PerfTimer } from "@/lib/security/logger";
 
 interface PostRegistrationOptions {
   supabaseId: string;
@@ -23,6 +24,7 @@ export async function postRegistration({
   email,
   name,
 }: PostRegistrationOptions): Promise<{ success: boolean; error?: string }> {
+  const timer = new PerfTimer();
   // ── Rate limit by IP ────────────────────────────────────────────────────
   const headerStore = await headers();
   const ip =
@@ -47,8 +49,17 @@ export async function postRegistration({
       name,
     });
 
-    // ── Send welcome email (non-blocking — errors are caught internally) ──
-    await sendWelcomeEmail({ to: normalizedEmail, name });
+    // ── Send welcome email in the background (completely non-blocking!) ──
+    sendWelcomeEmail({ to: normalizedEmail, name }).catch((err) => {
+      console.error("[postRegistration] background welcome email failed:", err);
+    });
+
+    const elapsed = timer.stop();
+    devLog("SIGNUP", "User successfully registered & database profiles self-healed.", {
+      supabaseId,
+      email: normalizedEmail,
+      ip,
+    }, elapsed);
 
     return { success: true };
   } catch (err) {
@@ -102,7 +113,7 @@ export async function checkPasswordResetRateLimit(): Promise<{
   const ip =
     headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
 
-  const rl = checkRateLimit("login", ip); // Re-use general rate limit bucket to prevent spamming
+  const rl = checkRateLimit("forgot_password", ip);
   if (!rl.allowed) {
     const waitSec = Math.ceil((rl.remainingMs ?? 0) / 1000);
     return {

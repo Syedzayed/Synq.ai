@@ -239,6 +239,25 @@ export async function sendMessage(
   const user = await getServerUser();
   if (!user) return { success: false, error: "Not authenticated." };
 
+  // ── Rate Limit Checks (IP-based and User-based) ──────────────────────────
+  const { headers } = await import("next/headers");
+  const { checkRateLimit } = await import("@/lib/security/rate-limit");
+  const headerStore = await headers();
+  const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+
+  const rlUser = checkRateLimit("messaging", user.id);
+  const rlIp = checkRateLimit("messaging", ip);
+
+  if (!rlUser.allowed || !rlIp.allowed) {
+    const remainingUser = rlUser.remainingMs ?? 0;
+    const remainingIp = rlIp.remainingMs ?? 0;
+    const waitSec = Math.ceil(Math.max(remainingUser, remainingIp) / 1000);
+    return {
+      success: false,
+      error: `Too many messages sent. Please wait ${waitSec}s.`,
+    };
+  }
+
   const trimmed = content.trim();
   if (!trimmed) return { success: false, error: "Message cannot be empty." };
   if (trimmed.length > 4000) return { success: false, error: "Message too long." };

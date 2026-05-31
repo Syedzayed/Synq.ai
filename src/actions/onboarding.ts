@@ -17,6 +17,7 @@ import { createSupabaseServerClient } from "@/lib/auth/supabase-server";
 import { generateProfileSummary } from "@/lib/ai/summarizer";
 import { generateProfileEmbedding } from "@/lib/ai/embeddings";
 import { createNotification } from "./notifications";
+import { devLog, PerfTimer } from "@/lib/security/logger";
 
 export interface OnboardingData {
   name: string;
@@ -38,6 +39,7 @@ export interface OnboardingResult {
 export async function completeOnboarding(
   data: OnboardingData
 ): Promise<OnboardingResult> {
+  const timer = new PerfTimer();
   // ── 1. Auth guard ─────────────────────────────────────────────────────────
   const supabase = await createSupabaseServerClient();
   const {
@@ -159,6 +161,13 @@ export async function completeOnboarding(
     title: "Welcome to Synq!",
     message: "Your profile is live. Explore your AI-powered matches and start connecting.",
   });
+
+  const elapsed = timer.stop();
+  devLog("ONBOARDING", "Onboarding completed successfully.", {
+    userId: user.id,
+    hasSummary: !!aiSummary,
+    hasEmbedding: embedding.length > 0,
+  }, elapsed);
 
   return { success: true, aiSummary: aiSummary ?? undefined };
 }

@@ -62,6 +62,8 @@ export const viewport: Viewport = {
   themeColor: "#fdfbf7",
 };
 
+import { SessionTimeoutProvider } from "@/components/auth/session-timeout-provider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -76,7 +78,9 @@ export default function RootLayout({
         className="min-h-full flex flex-col overflow-x-hidden"
         style={{ background: "#fdfbf7", color: "#1e1a17" }}
       >
-        {children}
+        <SessionTimeoutProvider>
+          {children}
+        </SessionTimeoutProvider>
       </body>
     </html>
   );

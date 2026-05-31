@@ -71,6 +71,25 @@ export async function sendConnectionRequest(
   if (!user) return { success: false, error: "Not authenticated." };
   if (user.id === receiverId) return { success: false, error: "Cannot connect with yourself." };
 
+  // ── Rate Limit Checks (IP-based and User-based) ──────────────────────────
+  const { headers } = await import("next/headers");
+  const { checkRateLimit } = await import("@/lib/security/rate-limit");
+  const headerStore = await headers();
+  const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+
+  const rlUser = checkRateLimit("connection_request", user.id);
+  const rlIp = checkRateLimit("connection_request", ip);
+  
+  if (!rlUser.allowed || !rlIp.allowed) {
+    const remainingUser = rlUser.remainingMs ?? 0;
+    const remainingIp = rlIp.remainingMs ?? 0;
+    const waitSec = Math.ceil(Math.max(remainingUser, remainingIp) / 1000);
+    return {
+      success: false,
+      error: `Too many connection requests. Please wait ${waitSec}s.`,
+    };
+  }
+
   // Check if a connection already exists in either direction
   const existing = await db.connection.findFirst({
     where: {

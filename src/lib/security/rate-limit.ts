@@ -15,8 +15,12 @@ interface RateLimitEntry {
 const store = new Map<string, RateLimitEntry>();
 
 const LIMITS: Record<string, { max: number; windowMs: number }> = {
-  login: { max: 5, windowMs: 60_000 },     // 5 attempts per 60 s
-  register: { max: 3, windowMs: 300_000 }, // 3 attempts per 5 min
+  login: { max: 5, windowMs: 60_000 },             // 5 attempts per 60 s
+  register: { max: 3, windowMs: 300_000 },         // 3 attempts per 5 min
+  forgot_password: { max: 3, windowMs: 300_000 },  // 3 attempts per 5 min
+  ai_chat: { max: 15, windowMs: 60_000 },          // 15 requests per 1 min
+  connection_request: { max: 10, windowMs: 60_000 }, // 10 requests per 1 min
+  messaging: { max: 30, windowMs: 60_000 },        // 30 requests per 1 min
 };
 
 /**
