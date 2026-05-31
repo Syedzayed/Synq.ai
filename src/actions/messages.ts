@@ -96,7 +96,7 @@ export async function createConversation(
 
   // Verify both participants are present (findFirst may match partial)
   if (existing) {
-    const userIds = existing.participants.map((p) => p.userId);
+    const userIds = existing.participants.map((p: { userId: string }) => p.userId);
     if (userIds.includes(user.id) && userIds.includes(otherUserId)) {
       return { success: true, conversationId: existing.id };
     }
