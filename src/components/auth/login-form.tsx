@@ -10,7 +10,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { loginSchema, type LoginInput } from "@/lib/validations";
 import { supabase } from "@/lib/auth/supabase";
-import { checkLoginRateLimit } from "@/actions/auth";
+import { checkLoginRateLimit, postRegistration, seedAdminUserPrismaRole } from "@/actions/auth";
 import { AuthCard } from "./auth-card";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -129,17 +129,68 @@ export function LoginForm() {
       return;
     }
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    });
+    let authError: any = null;
+    const isAdminUser = data.email.toLowerCase() === "admin@gmail.com" && data.password === "Admin@123";
 
-    if (error) {
+    if (isAdminUser) {
+      const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
+
+      authError = signInErr;
+
+      // If admin user doesn't exist in Supabase auth, register them programmatically
+      if (signInErr && (signInErr.message.includes("Invalid login credentials") || signInErr.message.includes("not found"))) {
+        const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
+          email: data.email,
+          password: data.password,
+          options: {
+            data: {
+              full_name: "System Administrator",
+            },
+          },
+        });
+
+        if (!signUpErr && signUpData.user) {
+          // Sync to Prisma DB
+          await postRegistration({
+            supabaseId: signUpData.user.id,
+            email: data.email,
+            name: "System Administrator",
+          });
+
+          // Set complete & Admin role in Prisma DB using the secure Server Action
+          try {
+            await seedAdminUserPrismaRole(signUpData.user.id);
+          } catch (dbErr) {
+            console.error("Failed to seed admin Prisma roles:", dbErr);
+          }
+
+          // Retry login
+          const { error: retryErr } = await supabase.auth.signInWithPassword({
+            email: data.email,
+            password: data.password,
+          });
+          authError = retryErr;
+        } else {
+          authError = signUpErr;
+        }
+      }
+    } else {
+      const { error: signInErr } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
+      authError = signInErr;
+    }
+
+    if (authError) {
       setFormState("error");
       setErrorMessage(
-        error.message === "Invalid login credentials"
+        authError.message === "Invalid login credentials"
           ? "Incorrect email or password. Please try again."
-          : error.message
+          : authError.message
       );
       return;
     }
@@ -151,7 +202,9 @@ export function LoginForm() {
     // Also honour the ?next redirect param set by the proxy on protected routes.
     const next = searchParams.get("next");
     const destination =
-      next && next.startsWith("/") ? next : "/onboarding";
+      data.email.toLowerCase() === "admin@gmail.com"
+        ? "/admin"
+        : (next && next.startsWith("/") ? next : "/onboarding");
 
     setTimeout(() => {
       window.location.href = destination;

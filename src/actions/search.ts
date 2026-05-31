@@ -74,6 +74,7 @@ export async function searchProfiles(
     // 2. Build where filters
     const whereConditions: any = {
       userId: { not: user.id }, // exclude self
+      completedAt: { not: null }, // exclude incomplete / anonymous draft profiles!
     };
 
     // Text search (name, role, organization, bio) or array contains (skills, interests)
@@ -184,6 +185,7 @@ export async function getFilterOptions(): Promise<{
 }> {
   try {
     const profiles = await db.profile.findMany({
+      where: { completedAt: { not: null } },
       select: {
         role: true,
         skills: true,

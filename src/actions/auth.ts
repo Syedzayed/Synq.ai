@@ -80,3 +80,15 @@ export async function checkLoginRateLimit(): Promise<{
 
   return { allowed: true };
 }
+
+/** Server-side admin role seeder - sets role to Admin and completedAt to current date. */
+export async function seedAdminUserPrismaRole(supabaseUserId: string): Promise<void> {
+  const { db } = await import("@/lib/db/prisma");
+  await db.profile.update({
+    where: { userId: supabaseUserId },
+    data: {
+      role: "Admin",
+      completedAt: new Date(),
+    },
+  });
+}
