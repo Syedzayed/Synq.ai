@@ -56,6 +56,22 @@ export async function completeOnboarding(
     return { success: false, error: "Please add at least one skill." };
   }
 
+  // ── Self-healing database check: ensure the User row exists first ─────────
+  const userExists = await db.user.findUnique({
+    where: { id: user.id },
+  });
+
+  if (!userExists) {
+    console.log(`[completeOnboarding] Self-healing sync: User row missing for ${user.id}. Creating row.`);
+    await db.user.create({
+      data: {
+        id: user.id,
+        email: user.email!,
+        name: data.name.trim(),
+      },
+    });
+  }
+
   // ── 3. Upsert base profile (before AI calls, to save data immediately) ────
   await db.profile.upsert({
     where: { userId: user.id },
