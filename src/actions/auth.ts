@@ -92,3 +92,24 @@ export async function seedAdminUserPrismaRole(supabaseUserId: string): Promise<v
     },
   });
 }
+
+/** Rate-checked password reset helper — called from forgot-password form. */
+export async function checkPasswordResetRateLimit(): Promise<{
+  allowed: boolean;
+  error?: string;
+}> {
+  const headerStore = await headers();
+  const ip =
+    headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+
+  const rl = checkRateLimit("login", ip); // Re-use general rate limit bucket to prevent spamming
+  if (!rl.allowed) {
+    const waitSec = Math.ceil((rl.remainingMs ?? 0) / 1000);
+    return {
+      allowed: false,
+      error: `Too many password reset requests. Please wait ${waitSec}s.`,
+    };
+  }
+
+  return { allowed: true };
+}

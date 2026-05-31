@@ -307,6 +307,16 @@ export function LoginForm() {
           }
         />
 
+        <div className="flex justify-end -mt-2">
+          <Link
+            href="/forgot-password"
+            className="text-[12.5px] font-semibold underline hover:opacity-80 transition-opacity"
+            style={{ color: "#e07a5f" }}
+          >
+            Forgot password?
+          </Link>
+        </div>
+
         {/* Submit */}
         <motion.button
           id="login-submit"
