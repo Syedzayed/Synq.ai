@@ -155,9 +155,9 @@ export async function getConversations(): Promise<ConversationPreview[]> {
   ]);
 
   // Build lookup maps
-  const participantByConvo = new Map(allParticipants.map((p) => [p.conversationId, p]));
-  const lastMsgByConvo = new Map(lastMessages.map((m) => [m.conversationId, m]));
-  const unreadByConvo = new Map(unreadCounts.map((u) => [u.conversationId, u._count.id]));
+  const participantByConvo = new Map<string, any>(allParticipants.map((p: any) => [p.conversationId, p]));
+  const lastMsgByConvo = new Map<string, any>(lastMessages.map((m: any) => [m.conversationId, m]));
+  const unreadByConvo = new Map<string, number>(unreadCounts.map((u: any) => [u.conversationId, u._count.id]));
 
   const previews: ConversationPreview[] = [];
 
@@ -210,10 +210,10 @@ export async function getMessages(conversationId: string): Promise<{
     }),
   ]);
 
-  const otherParticipant = participants.find((p) => p.userId !== user.id);
+  const otherParticipant = participants.find((p: any) => p.userId !== user.id);
 
   return {
-    messages: messages.map((m) => ({
+    messages: messages.map((m: any) => ({
       id: m.id,
       senderId: m.senderId,
       content: m.content,
