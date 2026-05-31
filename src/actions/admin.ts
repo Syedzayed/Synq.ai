@@ -25,15 +25,19 @@ export async function checkIsAdmin(): Promise<boolean> {
   const user = await getServerUser();
   if (!user) return false;
 
-  // Professional Admin check:
-  // 1. Email contains "admin" OR
-  // 2. Profile role contains "admin" OR
-  // 3. Email is the first registered user OR
-  // 4. In development, allow bypass for convenience.
-  if (user.email?.toLowerCase().includes("admin") || user.email === "admin@synq.ai") {
+  // Strict list of approved admin emails for demo/production security
+  const ADMIN_EMAILS = [
+    "syedzayedahmed2004@gmail.com",
+    "admin@gmail.com",
+    "admin@synq.ai"
+  ];
+
+  const userEmail = user.email?.toLowerCase();
+  if (userEmail && ADMIN_EMAILS.includes(userEmail)) {
     return true;
   }
 
+  // Role-based auth verification fallback (from Prisma database)
   const profile = await db.profile.findUnique({
     where: { userId: user.id },
     select: { role: true },

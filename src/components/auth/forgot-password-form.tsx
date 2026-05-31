@@ -123,13 +123,30 @@ export function ForgotPasswordForm() {
       ? `${window.location.origin}/auth/callback?next=/reset-password&type=recovery`
       : "https://synq-ai-ten.vercel.app/auth/callback?next=/reset-password&type=recovery";
 
+    // Password reset emails require a verified Resend domain for unrestricted delivery.
+    // In a Resend sandbox account, emails can only be sent to the verified domain's owner/recipients.
     const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
       redirectTo: redirectToUrl,
     });
 
     if (error) {
       setFormState("error");
-      setErrorMessage(error.message);
+      
+      // Gracefully handle common sandbox/relay delivery restrictions without crashing the application
+      const msg = error.message.toLowerCase();
+      if (
+        msg.includes("relay") || 
+        msg.includes("delivery") || 
+        msg.includes("sandbox") || 
+        msg.includes("not verified") ||
+        msg.includes("unverified")
+      ) {
+        setErrorMessage(
+          "Email delivery failed. During demo/sandbox evaluation, password reset emails can only be delivered to verified sandbox recipient addresses. Please verify your custom domain in Resend for unrestricted delivery."
+        );
+      } else {
+        setErrorMessage(error.message);
+      }
       return;
     }
 

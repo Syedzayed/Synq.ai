@@ -113,6 +113,25 @@ npm run build
 
 ## 🛡️ Security & Optimization Guards
 
-*   **Server Actions Validation**: Double-layered authorization checks safeguarding administrative actions and data retrieval server-side.
-*   **Rate-Limiter Protection**: Strict IP-based request rate limiting protecting register and login forms from brute force attacks.
-*   **Safe Client Hydration**: Complete decoupling of heavy database imports from Client Components to prevent database bundles from entering browser assets.
+* **Server Actions Validation**: Double-layered authorization checks safeguarding administrative actions and data retrieval server-side.
+* **Rate-Limiter Protection**: Strict IP-based request rate limiting protecting register and login forms from brute force attacks.
+* **Safe Client Hydration**: Complete decoupling of heavy database imports from Client Components to prevent database bundles from entering browser assets.
+
+---
+
+## 🔑 Authentication Notes & Production Recommendations
+
+### 1. ⚙️ Authentication Notes (Assessment / Demo Settings)
+For the purpose of easy and frictionless evaluation during assessment and demo trials:
+* **Email Verification Disabled**: Mandatory Supabase sign-up email confirmation has been intentionally deactivated. Registered users are immediately routed to log in and proceed through onboarding without email friction.
+* **Welcome Emails**: Programmatic welcome emails are automatically triggered via the Resend API on successful profile creation, processed as a non-blocking background task (failures will never disrupt registration).
+* **Password Reset delivery**: The complete recovery flow (`/forgot-password` and `/reset-password`) is fully implemented. Users can submit reset prompts and secure new passwords securely.
+* **Resend Sandbox constraints**: Since the demonstration utilizes a Resend sandbox account, password reset emails and welcome notes can only be delivered to verified sandbox recipient addresses (e.g. the account owner's email).
+* **Production custom domains**: In standard production environments, a verified custom sending domain is required to send emails freely to unrestricted recipient inboxes.
+
+### 2. 🛡️ Production Recommendations
+When migrating the Synq platform from assessment/sandbox trials into a live production environment, we highly recommend applying the following security measures:
+* **Enable Email Verification**: Turn the "Confirm Email" toggle back to **ON** inside the Supabase Auth Project Settings panel.
+* **Verify Custom Domain**: Fully verify your sending domain (e.g., `synq.ai` or your own domain) by completing the DKIM/SPF setup in your [Resend Domains Dashboard](https://resend.com/domains).
+* **Configure Custom SMTP**: Apply the custom Resend SMTP relay settings (port `465` / secure SSL) inside the Supabase Project Dashboard under custom SMTP parameters (see detailed credentials in [docs/supabase-resend-smtp.md](file:///c:/Synq/docs/supabase-resend-smtp.md)).
+* **Configure Production Callback URLs**: Ensure the redirect list in Supabase is updated to strictly permit your live production URLs (`https://synq-ai-ten.vercel.app/auth/callback`) to protect credentials transfer.

@@ -235,6 +235,26 @@ export function LoginForm() {
         </p>
       </div>
 
+      {/* Info/Message banner from URL search parameters */}
+      <AnimatePresence>
+        {searchParams.get("message") && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-5 flex items-start gap-3 rounded-2xl p-3.5"
+            style={{
+              background: "rgba(107,144,128,0.07)",
+              border: "1px solid rgba(107,144,128,0.2)",
+            }}
+          >
+            <CheckCircle size={15} className="shrink-0 mt-0.5" style={{ color: "#6b9080" }} />
+            <p className="text-[13px]" style={{ color: "#6b9080" }}>
+              {searchParams.get("message")}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Error banner */}
       <AnimatePresence>
         {formState === "error" && (
@@ -269,7 +289,7 @@ export function LoginForm() {
             }}
           >
             <CheckCircle size={15} className="text-green-500 shrink-0" />
-            <p className="text-[13px] text-green-700">Signed in! Redirecting…</p>
+            <p className="text-[13px] text-green-700">Welcome back.</p>
           </motion.div>
         )}
       </AnimatePresence>

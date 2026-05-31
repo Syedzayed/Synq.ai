@@ -198,7 +198,7 @@ export function ResetPasswordForm() {
           >
             <CheckCircle2 size={15} className="shrink-0" style={{ color: "#6b9080" }} />
             <p className="text-[13px]" style={{ color: "#6b9080" }}>
-              Password updated! Redirecting to login...
+              Your password has been updated.
             </p>
           </motion.div>
         )}

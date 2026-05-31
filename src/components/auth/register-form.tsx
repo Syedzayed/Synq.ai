@@ -164,20 +164,12 @@ export function RegisterForm() {
       }
     }
 
-    if (authData.session) {
-      // Email confirmation is OFF — session is immediately available.
-      // Hard-navigate so the browser sends the new session cookie to Next.js
-      // and proxy.ts can hydrate the Supabase session on the next request.
-      setFormState("success");
-      setTimeout(() => {
-        window.location.href = "/onboarding";
-      }, 1200);
-    } else {
-      // Email confirmation is ON — no session yet.
-      // Show a "check your inbox" state instead of redirecting to a
-      // protected page the user cannot access until they confirm.
-      setFormState("confirm-email");
-    }
+    // Force successful account creation message and redirect directly to /login for the demo flow.
+    // Flow: Register -> Account Created -> Login -> Onboarding -> Dashboard
+    setFormState("success");
+    setTimeout(() => {
+      window.location.href = "/login?message=Account created successfully.";
+    }, 1500);
   };
 
   const isLoading = formState === "loading";
@@ -250,7 +242,7 @@ export function RegisterForm() {
           >
             <CheckCircle size={15} className="text-green-500 shrink-0 mt-0.5" />
             <p className="text-[13px] text-green-700">
-              Account created! Redirecting you now…
+              Account created successfully.
             </p>
           </motion.div>
         )}
