@@ -25,11 +25,12 @@ export async function checkIsAdmin(): Promise<boolean> {
   const user = await getServerUser();
   if (!user) return false;
 
+  const envAdminEmail = process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL || "admin@gmail.com";
   // Strict list of approved admin emails for demo/production security
   const ADMIN_EMAILS = [
     "syedzayedahmed2004@gmail.com",
-    "admin@gmail.com",
-    "admin@synq.ai"
+    "admin@synq.ai",
+    envAdminEmail.toLowerCase()
   ];
 
   const userEmail = user.email?.toLowerCase();

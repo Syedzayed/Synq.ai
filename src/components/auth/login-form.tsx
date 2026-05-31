@@ -129,68 +129,17 @@ export function LoginForm() {
       return;
     }
 
-    let authError: any = null;
-    const isAdminUser = data.email.toLowerCase() === "admin@gmail.com" && data.password === "Admin@123";
+    const { error: signInErr } = await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
+    });
 
-    if (isAdminUser) {
-      const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      });
-
-      authError = signInErr;
-
-      // If admin user doesn't exist in Supabase auth, register them programmatically
-      if (signInErr && (signInErr.message.includes("Invalid login credentials") || signInErr.message.includes("not found"))) {
-        const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
-          email: data.email,
-          password: data.password,
-          options: {
-            data: {
-              full_name: "System Administrator",
-            },
-          },
-        });
-
-        if (!signUpErr && signUpData.user) {
-          // Sync to Prisma DB
-          await postRegistration({
-            supabaseId: signUpData.user.id,
-            email: data.email,
-            name: "System Administrator",
-          });
-
-          // Set complete & Admin role in Prisma DB using the secure Server Action
-          try {
-            await seedAdminUserPrismaRole(signUpData.user.id);
-          } catch (dbErr) {
-            console.error("Failed to seed admin Prisma roles:", dbErr);
-          }
-
-          // Retry login
-          const { error: retryErr } = await supabase.auth.signInWithPassword({
-            email: data.email,
-            password: data.password,
-          });
-          authError = retryErr;
-        } else {
-          authError = signUpErr;
-        }
-      }
-    } else {
-      const { error: signInErr } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      });
-      authError = signInErr;
-    }
-
-    if (authError) {
+    if (signInErr) {
       setFormState("error");
       setErrorMessage(
-        authError.message === "Invalid login credentials"
+        signInErr.message === "Invalid login credentials"
           ? "Incorrect email or password. Please try again."
-          : authError.message
+          : signInErr.message
       );
       return;
     }
@@ -201,8 +150,9 @@ export function LoginForm() {
     // to Next.js on the next request — this lets proxy.ts refresh the session.
     // Also honour the ?next redirect param set by the proxy on protected routes.
     const next = searchParams.get("next");
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "syedzayedahmed2004@gmail.com";
     const destination =
-      data.email.toLowerCase() === "admin@gmail.com"
+      data.email.toLowerCase() === adminEmail.toLowerCase()
         ? "/admin"
         : (next && next.startsWith("/") ? next : "/onboarding");
 

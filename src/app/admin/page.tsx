@@ -99,16 +99,18 @@ export default function AdminPage() {
             This route is reserved for platform monitoring. You do not have permissions to access the system statistics.
           </p>
 
-          {/* Prompt Credentials Banner */}
+          {/* Admin Access Gating Banner */}
           <div className="mb-6 p-4 rounded-2xl bg-amber-50/60 border border-amber-200/50 flex flex-col gap-1.5 text-left">
-            <div className="flex items-center gap-1.5 text-amber-800 text-[12.5px] font-bold">
+            <div className="flex items-center gap-1.5 text-amber-850 text-[12.5px] font-bold" style={{ color: "#92400e" }}>
               <Key size={13} />
-              Admin Credentials:
+              Admin Access Guard:
             </div>
-            <div className="text-[12px] space-y-1 font-mono text-amber-700/90">
-              <div>Email: <span className="font-semibold select-all">admin@gmail.com</span></div>
-              <div>Password: <span className="font-semibold select-all">Admin@123</span></div>
-            </div>
+            <p className="text-[12px] leading-relaxed" style={{ color: "#92400e" }}>
+              Only the authorized email <span className="font-mono font-bold select-all">{process.env.NEXT_PUBLIC_ADMIN_EMAIL || "syedzayedahmed2004@gmail.com"}</span> has administrative rights.
+            </p>
+            <p className="text-[11.5px] leading-relaxed mt-1" style={{ color: "#b45309" }}>
+              For sandbox evaluation and assessment, click the **Bypass / Enter Sandbox Mode** button below to simulate administration access and inspect platform analytics metrics.
+            </p>
           </div>
 
           <div className="space-y-3">

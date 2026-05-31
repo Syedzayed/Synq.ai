@@ -58,12 +58,26 @@ Discover acts as the primary hub for networking and matchmaking. It merges explo
   - Restricted context prevents leakage of environment variables, APIs, system settings, or table schemas.
 
 ### 5. 📊 Premium Administrator Panel (`/admin`)
+
+Our administrative suite is designed to give an absolute overview of the platform's vital signs and dynamic interaction telemetry.
+
+#### 🖥️ Dashboard Interface
+![Synq Platform Health & Analytics Dashboard](public/admin-panel.png)
+
 - **Advanced Platform KPI Analytics**: Real-time analytical statistics displaying Onboarding Funnel Completion rates, Connection Approval Success percentages, Match Recommendations coverage, and Message density logs.
 - **Live Stream Feed**: Chronological transaction stream tracking signups, connection changes, and chat session creation.
-- **🔑 Standard Admin Credentials**:
-  - **Email**: `admin@gmail.com`
-  - **Password**: `Admin@123`
-  - *Bypass Action*: Logging in with these credentials automatically seeds the admin profile, marks onboarding completed, and routes the reviewer directly to the admin suite.
+
+#### 🛡️ Role-Based Access Control (RBAC) & Dynamic Authorization
+Access to the administrator dashboard is strictly protected at the route and server-actions level.
+- **Authorized Email Address**: Gated dynamically by email identity matching and role configurations. The active administrator email is securely loaded from environmental variables (refer to `.env.example` for details).
+- **No Hardcoded Password**: Authorization is identity-driven and verified through Supabase session matching. The administrator signs up and logs in normally using their standard email and password.
+- **Cascading Access Evaluation (`checkIsAdmin()`)**:
+  1. Checks if the logged-in user's email matches the authorized `ADMIN_EMAIL` env variable.
+  2. Fallback: Checks if the user's Profile record in the database has its `role` explicitly containing `"admin"`.
+
+#### 🧪 Interactive Sandbox Mode for Reviewers
+For the convenience of assessors and recruiters reviewing the codebase:
+- **Sandbox Bypass**: Visiting `/admin` displays a secure **Bypass / Enter Sandbox Mode** button. Clicking this button activates sandbox mode, allowing you to preview and evaluate the interactive Platform Health metrics and Live Transaction feeds without needing to sign up or seed custom accounts.
 
 ---
 
@@ -98,6 +112,10 @@ MISTRAL_API_KEY=your_mistral_api_key
 NEXTAUTH_SECRET=your_auth_secret
 RESEND_API_KEY=your_resend_api_key
 RESEND_FROM_EMAIL=noreply@yourdomain.com
+
+# Dynamic Admin Credentials (optional, defaults provided)
+ADMIN_EMAIL=admin@example.com
+NEXT_PUBLIC_ADMIN_EMAIL=admin@example.com
 ```
 
 ### 3. Generate Database Client & Sync Schema
