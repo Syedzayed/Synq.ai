@@ -38,8 +38,8 @@ export async function POST(req: NextRequest) {
     data: { conversationId: convId, role: "user", content: content.trim() },
   });
 
-  // ── Load history + profile ────────────────────────────────────────────────
-  const [history, profile] = await Promise.all([
+  // ── Load history + profile + matches + connections ─────────────────────────
+  const [history, profile, recommendations, acceptedConns] = await Promise.all([
     db.message.findMany({
       where: { conversationId: convId },
       orderBy: { createdAt: "asc" },
@@ -53,10 +53,64 @@ export async function POST(req: NextRequest) {
         lookingFor: true, aiSummary: true,
       },
     }),
+    // Fetch user's match recommendations
+    db.matchRecommendation.findMany({
+      where: { userId: user.id },
+      orderBy: { score: "desc" },
+      take: 5,
+      include: {
+        matchedUser: {
+          include: { profile: true },
+        },
+      },
+    }),
+    // Fetch user's accepted connections
+    db.connection.findMany({
+      where: {
+        OR: [
+          { senderId: user.id, status: "ACCEPTED" },
+          { receiverId: user.id, status: "ACCEPTED" },
+        ],
+      },
+      include: {
+        sender: {
+          include: { profile: true },
+        },
+        receiver: {
+          include: { profile: true },
+        },
+      },
+    }),
   ]);
 
+  // Enrich profile object for System Prompt Context
+  const topMatches = recommendations
+    .filter((r) => r.matchedUser.profile?.completedAt != null)
+    .map((r) => ({
+      name: r.matchedUser.profile?.name ?? "User",
+      role: r.matchedUser.profile?.role ?? "Builder",
+      score: Math.round(r.score),
+      reason: r.reason,
+    }));
+
+  const connections = acceptedConns.map((c) => {
+    const peer = c.senderId === user.id ? c.receiver : c.sender;
+    return {
+      name: peer.profile?.name ?? peer.name ?? "User",
+      role: peer.profile?.role ?? "Builder",
+    };
+  });
+
+  const enrichedProfile = profile
+    ? {
+        ...profile,
+        topMatches,
+        connections,
+      }
+    : null;
+
   // ── Build messages ────────────────────────────────────────────────────────
-  const systemPrompt = buildSystemPrompt(profile);
+  const systemPrompt = buildSystemPrompt(enrichedProfile);
   // history already includes the user message we just saved, so use all but the last one for context
   const contextHistory = history.slice(0, -1);
   const messages = buildChatMessages(systemPrompt, contextHistory, content.trim());
